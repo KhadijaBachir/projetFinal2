@@ -1,0 +1,268 @@
+/* Style global */
+body {
+  background-color: #ff6f61;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Espacement entre navbar et contenu */
+.recompenses-container {
+  padding-top: 3rem; /* Espace ajouté ici */
+  background-color: #ff6f61;
+}
+
+/* Style des cartes de récompenses (votre style existant) */
+.reward-item-card {
+  background: white;
+  border-radius: 16px;
+  transition: all 0.4s ease;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  height: 100%;
+  border: none;
+  overflow: hidden;
+  position: relative;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  margin-bottom: 1.5rem; /* Espace entre les cartes */
+}
+
+.reward-item-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #ff9a8b, #ff6f61);
+  transition: all 0.3s ease;
+}
+
+.reward-item-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+}
+
+.reward-item-card:hover::before {
+  height: 8px;
+  background: linear-gradient(90deg, #ff6f61, #ff4757);
+}
+
+.reward-item-card.unlocked {
+  position: relative;
+}
+
+.reward-item-card.unlocked::after {
+  content: '✓';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  background-color: #4caf50;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.reward-icon {
+  font-size: 3rem;
+  margin: 1rem 0;
+  color: #ff6f61;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.reward-item-card:hover .reward-icon {
+  transform: scale(1.1) rotate(5deg);
+  color: #ff4757;
+}
+
+.reward-item-card .card-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.reward-item-card h5 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #333;
+}
+
+.reward-type {
+  display: inline-block;
+  background: rgba(255, 111, 97, 0.1);
+  color: #ff6f61;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.unlock-info {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 1.25rem;
+  line-height: 1.4;
+}
+
+/* Boutons */
+.reward-item-card .btn {
+  width: 100%;
+  border-radius: 50px;
+  padding: 0.5rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.reward-item-card .btn-outline-primary {
+  border: 2px solid #ff6f61;
+  color: #ff6f61;
+  background: transparent;
+}
+
+.reward-item-card .btn-outline-primary:hover {
+  background: #ff6f61;
+  color: #ff8c7f;
+  transform: translateY(-2px);
+}
+
+.reward-item-card .btn-success {
+  background: #4caf50;
+  border-color: #4caf50;
+}
+
+.reward-item-card .btn-success:hover {
+  background: #3e8e41;
+  border-color: #3e8e41;
+  transform: translateY(-2px);
+}
+
+/* Effet spécial pour les cartes débloquées */
+.reward-item-card.unlocked {
+  box-shadow: 0 8px 25px rgba(76, 175, 80, 0.2);
+}
+
+.reward-item-card.unlocked .reward-icon {
+  position: relative;
+}
+
+.reward-item-card.unlocked .reward-icon::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border: 2px solid #4caf50;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  70% { transform: scale(1.1); opacity: 0.3; }
+  100% { transform: scale(0.95); opacity: 0.7; }
+}
+
+/* Espacement supplémentaire pour les sections */
+.level-progress-container {
+  margin-bottom: 2rem; /* Espace après la barre de progression */
+}
+
+.level-header {
+  margin-bottom: 1.5rem; /* Espace avant les cartes */
+}
+.reward-category-card {
+  background-color:  #ff8c7f; /* Supprime le fond blanc */
+  border: none; /* Optionnel : retire la bordure si elle existe */
+  box-shadow: none; /* Optionnel : retire l'ombre */
+}
+/* Style exclusif pour la section points + motivation - NE MODIFIE PAS LE HTML */
+.header-card {
+  background-color: #ffb8a2; /* Couleur intermédiaire douce */
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(210, 77, 87, 0.25);
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  color: #5a2a27; /* Texte bordeaux foncé pour contraste */
+  position: relative;
+  overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+.header-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, #ff6f61, #ff8c7f);
+}
+
+.header-card h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  color: #5a2a27;
+}
+
+.header-card .display-4 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: #5a2a27;
+  margin: 0.5rem 0;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+}
+
+.current-level-badge {
+  background-color: #5a2a27 !important;
+  color: #ffb8a2 !important;
+  font-size: 1rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  display: inline-block;
+  margin: 0.8rem 0;
+}
+
+.level-progress-container {
+  background-color: rgba(90,42,39,0.1);
+  padding: 1.2rem;
+  border-radius: 12px;
+  margin: 1.5rem 0;
+}
+
+.level-progress-bar {
+  height: 10px;
+  border-radius: 5px;
+  background-color: rgba(90,42,39,0.2);
+}
+
+.level-progress-bar .progress-bar {
+  background: linear-gradient(90deg, #ff6f61, #ff8c7f);
+}
+
+.motivational-message {
+  font-size: 1.1rem;
+  font-style: italic;
+  margin-top: 1.5rem;
+  padding: 1.2rem;
+  background-color: rgba(255,255,255,0.4);
+  border-radius: 10px;
+  color: #5a2a27;
+  border-left: 4px solid #ff6f61;
+}
