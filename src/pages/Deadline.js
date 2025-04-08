@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Trophy, CheckCircle, Lightbulb } from "lucide-react";
+import { Rocket, Award, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { Container, Navbar, Nav } from "react-bootstrap";
@@ -26,24 +26,99 @@ const Deadline = () => {
 
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
-  // Fonction pour détecter la taille de l'écran
   const checkScreenSize = () => {
-    setIsSmallScreen(window.innerWidth <= 768); // 768px est la taille typique pour les petits écrans
+    setIsSmallScreen(window.innerWidth <= 768);
   };
 
-  // Ajouter un écouteur d'événement pour détecter les changements de taille d'écran
   useEffect(() => {
-    checkScreenSize(); // Vérifier la taille initiale
-    window.addEventListener("resize", checkScreenSize); // Mettre à jour lors du redimensionnement
-    return () => window.removeEventListener("resize", checkScreenSize); // Nettoyer l'écouteur
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
+
+  // Animations pour les cartes
+  const cardVariants = {
+    hidden: { 
+      y: 50,
+      opacity: 0,
+      scale: 0.95 
+    },
+    visible: {
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 10
+      }
+    },
+    hover: {
+      y: -10,
+      scale: 1.03,
+      boxShadow: "0 15px 30px -5px rgba(0,0,0,0.2)",
+      transition: {
+        type: "spring",
+        stiffness: 300
+      }
+    }
+  };
+
+  const iconVariants = {
+    hover: {
+      rotate: [0, 15, -15, 0],
+      scale: 1.1,
+      transition: {
+        duration: 0.6
+      }
+    }
+  };
+
+  // Styles des cartes
+  const cardStyles = {
+    primary: {
+      background: "linear-gradient(145deg, #ff9a8b, #ff6f61)",
+      color: "white",
+      border: "none"
+    },
+    warning: {
+      background: "linear-gradient(145deg, #ffb347, #ff8c00)",
+      color: "white",
+      border: "none"
+    },
+    success: {
+      background: "linear-gradient(145deg, #56ab2f, #a8e063)",
+      color: "white",
+      border: "none"
+    }
+  };
+
+  const buttonStyles = {
+    primary: {
+      background: "rgba(255,255,255,0.2)",
+      backdropFilter: "blur(5px)",
+      border: "1px solid rgba(255,255,255,0.3)",
+      fontWeight: "600"
+    },
+    warning: {
+      background: "rgba(255,255,255,0.2)",
+      backdropFilter: "blur(5px)",
+      border: "1px solid rgba(255,255,255,0.3)",
+      fontWeight: "600"
+    },
+    success: {
+      background: "rgba(255,255,255,0.2)",
+      backdropFilter: "blur(5px)",
+      border: "1px solid rgba(255,255,255,0.3)",
+      fontWeight: "600"
+    }
+  };
 
   return (
     <div style={{ backgroundColor: "#ff6f61", minHeight: "100vh", overflowX: "hidden" }}>
-      {/* Navbar */}
+      {/* Navbar - inchangé */}
       <Navbar expand="lg" className="shadow-sm" style={{ backgroundColor: "#ff8c7f", padding: "10px 0" }}>
         <Container>
-          {/* Logo à gauche avec animation */}
           <Navbar.Brand as={Link} to="/">
             <img
               src="/log.jpg"
@@ -57,7 +132,6 @@ const Deadline = () => {
             />
           </Navbar.Brand>
 
-          {/* Titre à droite */}
           <Navbar.Brand
             as={Link}
             to="/"
@@ -73,10 +147,8 @@ const Deadline = () => {
             Challenge Master
           </Navbar.Brand>
 
-          {/* Bouton de bascule pour les écrans mobiles */}
           <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ border: "none" }} />
 
-          {/* Liens de navigation */}
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto" style={{ alignItems: "center", marginRight: "5px" }}>
               {[
@@ -85,7 +157,7 @@ const Deadline = () => {
                 { name: "Défis", path: "/categories-defis" },
                 { name: "Récompenses", path: "/recompenses" },
                 { name: "Suggestions", path: "/suggestion" },
-                { name: "Profil", path: "/profile" }, // Lien vers Profile.js
+                { name: "Profil", path: "/profile" },
               ].map((link, index) => (
                 <Nav.Link
                   key={index}
@@ -102,18 +174,17 @@ const Deadline = () => {
                     borderRadius: "5px",
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = "rgba(255, 165, 0, 0.5)"; // Fond orange semi-transparent
-                    e.target.style.color = "#fff"; // Texte blanc
+                    e.target.style.backgroundColor = "rgba(255, 165, 0, 0.5)";
+                    e.target.style.color = "#fff";
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = "transparent"; // Fond transparent
-                    e.target.style.color = "#fff"; // Texte blanc
+                    e.target.style.backgroundColor = "transparent";
+                    e.target.style.color = "#fff";
                   }}
                 >
                   {link.name}
                 </Nav.Link>
               ))}
-              {/* Bouton Connexion */}
               <Nav.Link
                 as={Link}
                 to="/auth"
@@ -135,22 +206,17 @@ const Deadline = () => {
           </Navbar.Collapse>
         </Container>
 
-        {/* Styles globaux pour l'animation du logo */}
         <style>
           {`
             @keyframes spin {
-              0% {
-                transform: rotateY(0deg);
-              }
-              100% {
-                transform: rotateY(360deg);
-              }
+              0% { transform: rotateY(0deg); }
+              100% { transform: rotateY(360deg); }
             }
           `}
         </style>
       </Navbar>
 
-      {/* Image en haut de la page */}
+      {/* Image en haut - inchangée */}
       <img
         src="/je.avif"
         alt="Joie"
@@ -165,54 +231,100 @@ const Deadline = () => {
         }}
       />
 
+      {/* Section des cartes - modernisée */}
       <div className="container py-5">
         <h1 className="text-center mb-5 display-4 fw-bold text-white">Tableau de Bord</h1>
         <div className="row g-4">
-          {/* Défis en cours */}
+          {/* Carte Défis */}
           <div className="col-md-4">
-            <motion.div whileHover={{ scale: 1.05 }}>
-              <div className="card h-100 border-primary shadow">
-                <div className="card-body text-center p-4">
-                  <CheckCircle size={48} className="text-primary mb-3" />
-                  <h2 className="card-title fw-bold text-primary">Mes Défis</h2>
-                  <p className="card-text text-muted">Pret pour l'aventure?</p>
-                  <Link to="/categories-defis" className="btn btn-primary mt-3">Voir les détails</Link>
-                </div>
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              whileHover="hover"
+              variants={cardVariants}
+              className="card h-100 shadow-lg overflow-hidden"
+              style={cardStyles.primary}
+            >
+              <div className="card-body text-center p-4 d-flex flex-column">
+                <motion.div variants={iconVariants} whileHover="hover" className="mb-4">
+                  <Rocket size={48} className="mx-auto" />
+                </motion.div>
+                <h2 className="card-title fw-bold mb-3">Mes Défis</h2>
+                <p className="card-text mb-4">Prêt pour l'aventure?</p>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link 
+                    to="/categories-defis" 
+                    className="btn mt-3 mx-auto"
+                    style={buttonStyles.primary}
+                  >
+                    Voir les détails
+                  </Link>
+                </motion.div>
               </div>
             </motion.div>
           </div>
 
-          {/* Points gagnés */}
+          {/* Carte Points */}
           <div className="col-md-4">
-            <motion.div whileHover={{ scale: 1.05 }}>
-              <div className="card h-100 border-warning shadow">
-                <div className="card-body text-center p-4">
-                  <Trophy size={48} className="text-warning mb-3" />
-                  <h2 className="card-title fw-bold text-warning">Points gagnés</h2>
-                  <p className="card-text text-muted">Accomplis tes défis et gagnes des récompenses</p>
-                  <Link to="/recompenses" className="btn btn-warning mt-3">Voir les récompenses</Link>
-                </div>
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              whileHover="hover"
+              variants={cardVariants}
+              className="card h-100 shadow-lg overflow-hidden"
+              style={cardStyles.warning}
+            >
+              <div className="card-body text-center p-4 d-flex flex-column">
+                <motion.div variants={iconVariants} whileHover="hover" className="mb-4">
+                  <Award size={48} className="mx-auto" />
+                </motion.div>
+                <h2 className="card-title fw-bold mb-3">Points gagnés</h2>
+                <p className="card-text mb-4">Accomplis tes défis et gagnes des récompenses</p>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link 
+                    to="/recompenses" 
+                    className="btn mt-3 mx-auto"
+                    style={buttonStyles.warning}
+                  >
+                    Voir les récompenses
+                  </Link>
+                </motion.div>
               </div>
             </motion.div>
           </div>
 
-          {/* Suggestions de défis */}
+          {/* Carte Suggestions */}
           <div className="col-md-4">
-            <motion.div whileHover={{ scale: 1.05 }}>
-              <div className="card h-100 border-success shadow">
-                <div className="card-body text-center p-4">
-                  <Lightbulb size={48} className="text-success mb-3" />
-                  <h2 className="card-title fw-bold text-success">Suggestions</h2>
-                  <p className="card-text text-muted">Découvrez de nouveaux défis !</p>
-                  <Link to="/explorateur" className="btn btn-success mt-3">Explorer</Link>
-                </div>
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              whileHover="hover"
+              variants={cardVariants}
+              className="card h-100 shadow-lg overflow-hidden"
+              style={cardStyles.success}
+            >
+              <div className="card-body text-center p-4 d-flex flex-column">
+                <motion.div variants={iconVariants} whileHover="hover" className="mb-4">
+                  <Zap size={48} className="mx-auto" />
+                </motion.div>
+                <h2 className="card-title fw-bold mb-3">Suggestions</h2>
+                <p className="card-text mb-4">Découvrez de nouveaux défis !</p>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link 
+                    to="/explorateur" 
+                    className="btn mt-3 mx-auto"
+                    style={buttonStyles.success}
+                  >
+                    Explorer
+                  </Link>
+                </motion.div>
               </div>
             </motion.div>
           </div>
         </div>
       </div>
 
-      {/* Footer */}
+      {/* Footer - inchangé */}
       <footer style={{ backgroundColor: "#333", padding: "20px", marginTop: "50px" }}>
         <Container className="text-center">
           <p style={{ color: "#fff", fontSize: "1.2rem" }}>Suivez-nous sur :</p>
@@ -234,7 +346,6 @@ const Deadline = () => {
         </Container>
       </footer>
 
-      {/* ToastContainer pour afficher les notifications */}
       <ToastContainer />
     </div>
   );
