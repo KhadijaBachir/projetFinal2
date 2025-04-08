@@ -101,7 +101,27 @@ const  Religion = () => {
         icon: "FaPrayingHands",
         points: 5
       },
-     
+      {
+        id: "LdM2q6sFh9jXzy4vO5Qw",
+        name: "Faire un acte de charité",
+        description: "Aider une personne ou une cause dans le besoin",
+        icon: "FaPrayingHands",
+        points: 5
+      },
+      {
+        id: "XgF8pMzA2wJ5vK0h9Hk2",
+        name: "Faire une réflexion sur ma journée",
+        description: "Prendre du temps pour réfléchir à mes actions et pensées",
+        icon: "FaPrayingHands",
+        points: 5
+      },
+      {
+        id: "QeF0gKz1Bc6sH2pXv5aD",
+        name: "Prendre un moment pour la gratitude",
+        description: "Exprimer ma reconnaissance pour les bénédictions de la vie",
+        icon: "FaPrayingHands",
+        points: 5
+      },
  
     ];
 

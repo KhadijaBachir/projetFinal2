@@ -109,6 +109,20 @@ const TacheRepousse = () => {
           icon: "FaTasks",
           points: 5
         },
+        {
+          id: "LxP2vYF8QwJ7T1kA3SzM",
+          name: "Faire la paperasse",
+          description: "Ranger et organiser les documents administratifs",
+          icon: "FaTasks",
+          points: 5
+        },
+        {
+          id: "Hj7P8kMnNz9Q3w7JdR5z",
+          name: "Faire le ménage dans les emails",
+          description: "Supprimer les anciens mails et organiser les messages importants",
+          icon: "FaTasks",
+          points: 5
+        },
     ];
 
     return baseChallenges.map((challenge, index, array) => ({

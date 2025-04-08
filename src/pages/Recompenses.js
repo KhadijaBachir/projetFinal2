@@ -27,7 +27,15 @@ import {
   FaFacebook,
   FaTwitter,
   FaInstagram,
-  FaLinkedin
+  FaLinkedin,
+  FaHourglassStart,
+  FaCalendarCheck,
+  FaShieldAlt ,
+  FaCalendarDay,
+  FaRegCalendarCheck,
+  FaCalendarPlus,
+  FaRegClock
+
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
@@ -121,17 +129,47 @@ const REWARD_CONFIG = {
     }
   ],
   weeklyChallenges: [
-    { id: "weekly-1", name: "7 jours de productivité", type: "habitude", icon: <FaCalendarAlt />, pointsRequired: 7 }
+    { id: "weekly-1", name: "7 jours de productivité", type: "habitude", icon: "📅", pointsRequired: 7 },
+    { id: "constance-5", name: "5 jours consécutifs", type: "constance", icon: "⏳", pointsRequired: 5 },
+    { id: "constance-6", name: "10 jours sans échec", type: "constance", icon: "✅", pointsRequired: 10 },
+    { id: "constance-7", name: "15 jours de régularité", type: "constance", icon: "🛡️", pointsRequired: 15 },
+    { id: "constance-8", name: "2 mois de constance", type: "constance", icon: "📅", pointsRequired: 60 },
+    { id: "constance-9", name: "90 jours de productivité", type: "constance", icon: "📆", pointsRequired: 90 },
+    { id: "constance-10", name: "6 mois de réussite", type: "constance", icon: "➕", pointsRequired: 180 },
+    { id: "constance-11", name: "1 an de constance", type: "constance", icon: "📅", pointsRequired: 365 },
+    { id: "constance-12", name: "100 jours d'accomplissement", type: "constance", icon: "⏰", pointsRequired: 100 },
+    { id: "constance-13", name: "3 jours d'effort", type: "constance", icon: "💪", pointsRequired: 3 },
+    { id: "constance-14", name: "20 jours de productivité", type: "constance", icon: "🔥", pointsRequired: 20 },
+    { id: "constance-15", name: "30 jours sans interruption", type: "constance", icon: "🏅", pointsRequired: 30 },
+    
   ],
   seasonalRewards: [
-    { id: 'seasonal-1', name: 'Explorateur d\'Hiver', type: 'hiver', icon: <FaSnowflake />, season: 'winter' },
+    { id: 'seasonal-1', name: 'Explorateur d\'Hiver', type: 'hiver', icon: "❄️", season: 'winter' },
     { id: "seasonal-2", name: "Renouveau Printanier", type: "printemps", icon: "🌸", season: "spring" },
-    { id: "seasonal-3", name: "Été Productif", type: "été", icon: <FaSun />, season: "summer" },
-    { id: "seasonal-4", name: "Récolte Automnale", type: "automne", icon: <FaLeaf />, season: "autumn" }
+    { id: "seasonal-3", name: "Été Productif", type: "été", icon: "🌞", season: "summer" },
+    { id: "seasonal-4", name: "Récolte Automnale", type: "automne", icon: "🍁", season: "autumn" },
+    { id: 'seasonal-5', name: 'Aventurier d\'Hiver', type: 'hiver', icon: "⛄", season: 'winter' },
+    { id: "seasonal-6", name: "Éclat Printanier", type: "printemps", icon: "🌷", season: "spring" },
+    { id: "seasonal-7", name: "Plage de l\'Été", type: "été", icon: "🏖️", season: "summer" },
+    { id: "seasonal-8", name: "Festival Automnal", type: "automne", icon: "🎃", season: "autumn" },
+    { id: 'seasonal-9', name: 'Blizzard Hivernal', type: 'hiver', icon: "🌨️", season: 'winter' },
+    { id: "seasonal-10", name: "Douceur Printanière", type: "printemps", icon: "🐦", season: "spring" },
+    { id: "seasonal-11", name: "Soleil Estival", type: "été", icon: "🌴", season: "summer" },
+    { id: "seasonal-12", name: "Feuilles d\'Automne", type: "automne", icon: "🍂", season: "autumn" }
   ],
   specialRewards: [
     { id: 'special-1', name: 'Anniversaire', type: 'événement', icon: <FaBirthdayCake />, unlockCondition: 'date' },
-    { id: "special-2", name: "VIP", type: "exclusivité", icon: "🌟", unlockCondition: "admin" }
+    { id: "special-2", name: "VIP", type: "exclusivité", icon: "🌟", unlockCondition: "admin" },
+    { id: 'special-3', name: 'Fête de fin d\'année', type: 'événement', icon: "🎉", unlockCondition: 'date' },
+    { id: 'special-4', name: 'Utilisateur Privilégié', type: 'exclusivité', icon: "👑", unlockCondition: 'admin' },
+    { id: 'special-5', name: 'Marathon des Défis', type: 'challenge', icon: "🏅", unlockCondition: 'completeAllChallenges' },
+    { id: 'special-6', name: 'Ambassadeur', type: 'réseau', icon: "🌍", unlockCondition: 'referral' },
+    { id: 'special-7', name: 'Étoile Montante', type: 'récompense', icon: "🌠", unlockCondition: 'highScore' },
+    { id: 'special-8', name: 'Challengeur de l\'année', type: 'récompense', icon: "🏆", unlockCondition: 'yearlyWinner' },
+    { id: 'special-9', name: 'Explorateur de la communauté', type: 'réseau', icon: "🔍", unlockCondition: 'joinCommunity' },
+    { id: 'special-10', name: 'Légende des Défis', type: 'légendaire', icon: "👑", unlockCondition: 'legendaryAchievement' },
+    { id: 'special-11', name: 'Nouveau venu', type: 'réseau', icon: "👋", unlockCondition: 'newUser' },
+    { id: 'special-12', name: 'Superstar des défis', type: 'récompense', icon: "🌟", unlockCondition: 'complete10Challenges' }
   ],
   motivationalMessages: [
     "Bravo ! Chaque défi te rapproche de ton objectif ! 🚀",

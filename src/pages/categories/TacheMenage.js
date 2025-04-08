@@ -108,6 +108,21 @@ const TacheMenage = () => {
         icon: "FaHome",
         points: 5
       },
+      {
+        id: "Zn82KaPqL0RmT5vUx4we",
+        name: "Faire la vaisselle",
+        description: "Garde ta cuisine propre et agréable",
+        icon: "FaHome",
+        points: 5
+      },
+      {
+        id: "Tb61RjXnPaOqW9cLu8yz",
+        name: "Changer les draps",
+        description: "Un lit propre pour un bon sommeil",
+        icon: "FaHome",
+        points: 5
+      }
+      
     
      
     ];

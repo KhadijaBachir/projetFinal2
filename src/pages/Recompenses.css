@@ -72,10 +72,11 @@ body {
 .reward-icon {
   font-size: 3rem;
   margin: 1rem 0;
-  color: #ff6f61;
+  color: #ff6f61 !important; /* Utilisation de !important pour garantir l'application de la couleur */
   transition: all 0.3s ease;
   display: inline-block;
 }
+
 
 .reward-item-card:hover .reward-icon {
   transform: scale(1.1) rotate(5deg);

@@ -115,6 +115,14 @@ const Bienetre = () => {
         icon: "FaSmile",
         points: 5
       },
+      {
+        id: "Dk58TfMnVbLpE3xHz7ay",
+        name: "Prendre un bain ou une douche relaxante",
+        description: "Accorde-toi un moment de détente rien qu’à toi",
+        icon: "FaSmile",
+        points: 5
+      }
+      
     ];
 
     return baseChallenges.map((challenge, index, array) => ({

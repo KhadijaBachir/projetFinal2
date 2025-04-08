@@ -308,12 +308,23 @@ const Profile = () => {
 
             <h2>{user.name}</h2>
             <p className="text-muted">{user.email}</p>
-            <div className="badge bg-primary fs-5 mb-3">
+            <div className="d-flex justify-content-center gap-3 mb-3">
+            <Button variant="primary" className="fw-bold" style={{ minWidth: '150px' }}>
+              <span className="d-flex align-items-center justify-content-center">
               {user.points} points
-            </div>
-            <Button variant="danger" onClick={handleLogout}>
-              <FaSignOutAlt /> Déconnexion
-            </Button>
+              </span>
+           </Button>
+           <Button 
+            variant="danger" 
+            onClick={handleLogout}
+            style={{ minWidth: '150px' }}
+      >
+            <span className="d-flex align-items-center justify-content-center">
+             <FaSignOutAlt className="me-1" /> Déconnexion
+             </span>
+           </Button>
+           </div>
+           
           </Card.Body>
         </Card>
 

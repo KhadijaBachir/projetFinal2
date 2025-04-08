@@ -108,6 +108,21 @@ const  DevlopPerso = () => {
         icon: "FaHandHoldingHeart",
         points: 5
       },
+      {
+        id: "VzX5fH9G7LpR2qTz4JmW",
+        name: "Planifier une journée de détente",
+        description: "Prévoir une journée sans travail ni obligations pour me reposer et me ressourcer",
+        icon: "FaHandHoldingHeart",
+        points: 5
+      },
+      {
+        id: "KwT8u9F2C6GpQ7l6VhK3",
+        name: "S'évader dans la nature",
+        description: "Passer du temps à l'extérieur, faire une promenade dans un parc ou à la montagne pour me reconnecter à la nature",
+        icon: "FaHandHoldingHeart",
+        points: 5
+      }
+      
     ];
 
     return baseChallenges.map((challenge, index, array) => ({
