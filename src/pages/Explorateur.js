@@ -285,116 +285,116 @@ const Explorateur = () => {
       width: '100%',
       position: 'relative'
     }}>
-      {/* Navbar */}
-      <Navbar expand="lg" className="shadow-sm" style={{ backgroundColor: "#ff8c7f", padding: "10px 0" }}>
-        <Container>
-          {/* Logo à gauche avec animation */}
-          <Navbar.Brand as={Link} to="/">
-            <img
-              src="/log.jpg"
-              alt="Logo"
-              style={{
-                height: isSmallScreen ? "100px" : "150px",
-                borderRadius: "55px",
-                animation: "spin 4s linear infinite",
-                marginLeft: isSmallScreen ? "-20px" : "-90px",
-              }}
-            />
-          </Navbar.Brand>
-
-          {/* Titre à droite */}
-          <Navbar.Brand
-            as={Link}
-            to="/"
-            style={{
-              fontSize: isSmallScreen ? "1.8rem" : "2.2rem",
-              fontWeight: "bold",
-              fontFamily: "'Comic Sans MS', cursive, sans-serif",
-              color: "#fff",
-              marginLeft: isSmallScreen ? "5px" : "20px",
-              marginRight: "20px",
-            }}
-          >
-            Challenge Master
-          </Navbar.Brand>
-
-          {/* Bouton de bascule pour les écrans mobiles */}
-          <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ border: "none" }} />
-
-          {/* Liens de navigation */}
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto" style={{ alignItems: "center", marginRight: "5px" }}>
-              {[
-                { name: "Accueil", path: "/" },
-                { name: "Dashbord", path: "/deadline" },
-                { name: "Défis", path: "/categories-defis" },
-                { name: "Récompenses", path: "/recompenses" },
-                { name: "Suggestions", path: "/suggestion" },
-                { name: "Profil", path: "/profile" },
-              ].map((link, index) => (
-                <Nav.Link
-                  key={index}
+            {/* Navbar */}
+            <Navbar expand="lg" className="shadow-sm" style={{ backgroundColor: "#ff8c7f", padding: "10px 0" }}>
+              <Container>
+                {/* Logo à gauche avec animation */}
+                <Navbar.Brand as={Link} to="/">
+                  <img
+                    src="/im18.avif"
+                    alt="Logo"
+                    style={{
+                      height: isSmallScreen ? "100px" : "150px",
+                      borderRadius: "90px",
+                      animation: "spin 6s linear infinite",
+                      marginLeft: isSmallScreen ? "-20px" : "-90px",
+                    }}
+                  />
+                </Navbar.Brand>
+      
+                {/* Titre à droite */}
+                <Navbar.Brand
                   as={Link}
-                  to={link.path}
+                  to="/"
                   style={{
-                    fontSize: "1.2rem",
-                    fontWeight: "500",
-                    color: "#fff",
-                    margin: "0 10px",
-                    transition: "all 0.3s ease",
+                    fontSize: isSmallScreen ? "1.8rem" : "2.5rem",
+                    fontWeight: "bold",
                     fontFamily: "'Comic Sans MS', cursive, sans-serif",
-                    padding: "8px 12px",
-                    borderRadius: "5px",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = "rgba(255, 165, 0, 0.5)";
-                    e.target.style.color = "#fff";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = "transparent";
-                    e.target.style.color = "#fff";
+                    color: "#fff",
+                    marginLeft: isSmallScreen ? "5px" : "20px",
+                    marginRight: "20px",
                   }}
                 >
-                {link.name}
-                </Nav.Link>
-              ))}
-              {/* Bouton Connexion */}
-              <Nav.Link
-                as={Link}
-                to="/auth"
-                style={{
-                  backgroundColor: "#ff4500",
-                  borderRadius: "5px",
-                  padding: "9px 10px",
-                  color: "#fff",
-                  fontWeight: "500",
-                  transition: "background-color 0.3s",
-                  margin: "0 0px",
-                }}
-                onMouseEnter={(e) => (e.target.style.backgroundColor = "#ff9900")}
-                onMouseLeave={(e) => (e.target.style.backgroundColor = "#ff4500")}
-              >
-                Connexion
-              </Nav.Link>
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-
-        {/* Styles globaux pour l'animation du logo */}
-        <style>
-          {`
-            @keyframes spin {
-              0% {
-                transform: rotateY(0deg);
-              }
-              100% {
-                transform: rotateY(360deg);
-              }
-            }
-          `}
-        </style>
-      </Navbar>
-
+                  GoChallenges
+                </Navbar.Brand>
+      
+                {/* Bouton de bascule pour les écrans mobiles */}
+                <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ border: "none" }} />
+      
+                {/* Liens de navigation */}
+                <Navbar.Collapse id="basic-navbar-nav">
+                  <Nav className="ms-auto" style={{ alignItems: "center", marginRight: "5px" }}>
+                    {[
+                      { name: "Accueil", path: "/" },
+                      { name: "Dashbord", path: "/deadline" },
+                      { name: "Défis", path: "/categories-defis" },
+                      { name: "Récompenses", path: "/recompenses" },
+                      { name: "Suggestions", path: "/suggestion" },
+                      { name: "Profil", path: "/profile" }, // Lien vers Profile.js
+                    ].map((link, index) => (
+                      <Nav.Link
+                        key={index}
+                        as={Link}
+                        to={link.path}
+                        style={{
+                          fontSize: "1.2rem",
+                          fontWeight: "500",
+                          color: "#fff",
+                          margin: "0 10px",
+                          transition: "all 0.3s ease",
+                          fontFamily: "'Comic Sans MS', cursive, sans-serif",
+                          padding: "8px 12px",
+                          borderRadius: "5px",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = "rgba(255, 165, 0, 0.5)"; // Fond orange semi-transparent
+                          e.target.style.color = "#fff"; // Texte blanc
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = "transparent"; // Fond transparent
+                          e.target.style.color = "#fff"; // Texte blanc
+                        }}
+                      >
+                        {link.name}
+                      </Nav.Link>
+                    ))}
+                    {/* Bouton Connexion */}
+                    <Nav.Link
+                      as={Link}
+                      to="/auth"
+                      style={{
+                        backgroundColor: "#ff4500",
+                        borderRadius: "5px",
+                        padding: "12px 20px",
+                        color: "#fff",
+                        fontWeight: "500",
+                        transition: "background-color 0.3s",
+                        margin: "0 0px",
+                      }}
+                      onMouseEnter={(e) => (e.target.style.backgroundColor = "#ff9900")}
+                      onMouseLeave={(e) => (e.target.style.backgroundColor = "#ff4500")}
+                    >
+                      Connexion
+                    </Nav.Link>
+                  </Nav>
+                </Navbar.Collapse>
+              </Container>
+      
+              {/* Styles globaux pour l'animation du logo */}
+              <style>
+                {`
+                  @keyframes spin {
+                    0% {
+                      transform: rotateY(0deg);
+                    }
+                    100% {
+                      transform: rotateY(360deg);
+                    }
+                  }
+                `}
+              </style>
+            </Navbar>
+      
       {/* Bannière */}
       <div style={{
         width: "100%",
@@ -484,7 +484,7 @@ const Explorateur = () => {
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
-                    padding: "15px",
+                    paddingRight: "30px",
                     transform: "rotateY(0deg)"
                   }}>
                     <div style={{ fontSize: "2.2rem", marginBottom: "15px" }}>
@@ -529,7 +529,8 @@ const Explorateur = () => {
                         color: color.text,
                         fontFamily: "'Comic Sans MS', cursive",
                         fontSize: "1rem",
-                        textAlign: "center"
+                        textAlign: "center",
+                        paddingLeft:"10px"
                       }}
                     >
                       {challenge.text} {challenge.emoji}
@@ -541,12 +542,13 @@ const Explorateur = () => {
                         color: color.text,
                         border: "none",
                         borderRadius: "20px",
-                        padding: "8px 20px",
+                        padding: "8px 10px",
                         fontWeight: "bold",
                         width: "90%",
                         maxWidth: "180px",
-                        margin: "0 auto 10px",
-                        fontSize: "0.9rem"
+                        margin: "15px",
+                        fontSize: "0.9rem",
+                        marginLeft:"20px"
                       }}
                       whileHover={!isCompleted ? { scale: 1.03 } : {}}
                       whileTap={!isCompleted ? { scale: 0.98 } : {}}

@@ -3,14 +3,16 @@ import {
   auth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  sendPasswordResetEmail,
+  sendPasswordResetEmail
 } from "../firebaseConfig";
 import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Navbar, Nav, Container } from "react-bootstrap";
-import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
-import { getFirestore, doc, setDoc } from "firebase/firestore"; // Import Firestore
+import { Navbar, Nav, Container, Button as BsButton } from "react-bootstrap";
+import { 
+  FaFacebook, FaTwitter, FaInstagram, FaLinkedin
+} from "react-icons/fa";
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 
 const AuthPage = () => {
   const [name, setName] = useState("");
@@ -19,49 +21,72 @@ const AuthPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [showSignUp, setShowSignUp] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const db = getFirestore(); // Initialiser Firestore
+  const db = getFirestore();
 
-  // Détecter la taille de l'écran
-  const checkScreenSize = () => {
-    setIsSmallScreen(window.innerWidth <= 768);
-  };
-
+  // Détection de la taille de l'écran
   useEffect(() => {
+    const checkScreenSize = () => {
+      setIsSmallScreen(window.innerWidth <= 768);
+    };
     checkScreenSize();
     window.addEventListener("resize", checkScreenSize);
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
+  // Créer un document utilisateur dans Firestore
+  const createUserDocument = async (user, additionalData = {}) => {
+    if (!user) return;
+
+    const userRef = doc(db, "users", user.uid);
+    const userSnapshot = await getDoc(userRef);
+
+    if (!userSnapshot.exists()) {
+      try {
+        await setDoc(userRef, {
+          displayName: additionalData.name || user.email.split('@')[0],
+          email: user.email,
+          photoURL: null,
+          points: 0,
+          rewards: [],
+          challengesCompleted: 0,
+          createdAt: new Date().toISOString(),
+          ...additionalData
+        });
+
+        localStorage.setItem('userData', JSON.stringify({
+          name: additionalData.name || user.email.split('@')[0],
+          email: user.email,
+          photoURL: null,
+          points: 0,
+          rewards: []
+        }));
+      } catch (error) {
+        console.error("Erreur création document utilisateur:", error);
+      }
+    }
+  };
+
   // Gestion de l'inscription
   const handleSignUp = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      setErrorMessage("Les mots de passe ne correspondent pas.");
       toast.error("Les mots de passe ne correspondent pas.");
       return;
     }
+    
     try {
-      // Créer l'utilisateur avec Firebase Authentication
+      setLoading(true);
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-
-      // Créer un document utilisateur dans Firestore avec l'uid comme ID
-      const utilisateurRef = doc(db, "utilisateurs", user.uid);
-      await setDoc(utilisateurRef, {
-        name: name, // Ajouter le nom de l'utilisateur
-        email: email, // Ajouter l'email de l'utilisateur
-        points: 0, // Initialiser les points à 0
-        defis_accomplis: [], // Initialiser la liste des défis accomplis
-        recompenses_obtenues: [], // Initialiser la liste des récompenses obtenues
-      });
-
-      setSuccessMessage(`Bienvenue ${name} ! Inscription réussie.`);
+      
+      await createUserDocument(user, { name });
+      
       toast.success(`Bienvenue ${name} ! Inscription réussie.`);
-      navigate("/deadline", { state: { successMessage: `Bienvenue ${name} ! Inscription réussie.` } });
+      navigate("/profile");
     } catch (error) {
       let errorMessage = "Une erreur s'est produite lors de l'inscription.";
       if (error.code === "auth/email-already-in-use") {
@@ -69,8 +94,9 @@ const AuthPage = () => {
       } else if (error.code === "auth/weak-password") {
         errorMessage = "Le mot de passe doit contenir au moins 6 caractères.";
       }
-      setErrorMessage(errorMessage);
       toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -78,10 +104,24 @@ const AuthPage = () => {
   const handleSignIn = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      setSuccessMessage(`Bienvenue ${name}, vous êtes connecté(e) !`);
-      toast.success(`Bienvenue ${name}, vous êtes connecté(e) !`);
-      navigate("/deadline", { state: { successMessage: `Bienvenue ${name}, vous êtes connecté(e) !` } });
+      setLoading(true);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      const userRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userRef);
+
+      // Sauvegarde dans localStorage avec le prénom
+      localStorage.setItem('userData', JSON.stringify({
+        name: name || user.displayName || user.email.split('@')[0],
+        email: user.email,
+        photoURL: user.photoURL || null,
+        points: userDoc.data()?.points || 0,
+        rewards: userDoc.data()?.rewards || []
+      }));
+      
+      toast.success(`Bienvenue ${name || user.email}!`);
+      navigate("/profile");
     } catch (error) {
       let errorMessage = "Une erreur s'est produite lors de la connexion.";
       if (error.code === "auth/user-not-found") {
@@ -89,150 +129,150 @@ const AuthPage = () => {
       } else if (error.code === "auth/wrong-password") {
         errorMessage = "Mot de passe incorrect.";
       }
-      setErrorMessage(errorMessage);
       toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Gestion de la réinitialisation du mot de passe
+  // Réinitialisation du mot de passe
   const handlePasswordReset = async () => {
     if (!email) {
       toast.error("Veuillez entrer votre adresse email.");
       return;
     }
     try {
+      setLoading(true);
       await sendPasswordResetEmail(auth, email);
-      toast.success("Un email de réinitialisation de mot de passe a été envoyé.");
+      toast.success("Un email de réinitialisation a été envoyé.");
     } catch (error) {
-      console.error("Erreur lors de l'envoi de l'email de réinitialisation :", error);
-      toast.error("Erreur lors de l'envoi de l'email de réinitialisation : " + error.message);
+      toast.error("Erreur lors de l'envoi de l'email de réinitialisation");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ backgroundColor: "#ff6f61", minHeight: "100vh", display: "flex", flexDirection: "column", overflowX: "hidden" }}>
-      {/* Navbar */}
-      <Navbar expand="lg" className="shadow-sm" style={{ backgroundColor: "#ff8c7f", padding: "10px 0" }}>
-        <Container>
-          {/* Logo à gauche avec animation */}
-          <Navbar.Brand as={Link} to="/">
-            <img
-              src="/log.jpg"
-              alt="Logo"
-              style={{
-                height: isSmallScreen ? "100px" : "150px",
-                borderRadius: "55px",
-                animation: "spin 4s linear infinite",
-                marginLeft: isSmallScreen ? "-20px" : "-90px",
-              }}
-            />
-          </Navbar.Brand>
-
-          {/* Titre à droite */}
-          <Navbar.Brand
-            as={Link}
-            to="/"
-            style={{
-              fontSize: isSmallScreen ? "1.8rem" : "2.2rem",
-              fontWeight: "bold",
-              fontFamily: "'Comic Sans MS', cursive, sans-serif",
-              color: "#fff",
-              marginLeft: isSmallScreen ? "5px" : "20px",
-              marginRight: "20px",
-            }}
-          >
-            Challenge Master
-          </Navbar.Brand>
-
-          {/* Bouton de bascule pour les écrans mobiles */}
-          <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ border: "none" }} />
-
-          {/* Liens de navigation */}
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto" style={{ alignItems: "center", marginRight: "5px" }}>
-              {[
-                { name: "Accueil", path: "/" },
-                { name: "Dashbord", path: "/deadline" },
-                { name: "Défis", path: "/categories-defis" },
-                { name: "Récompenses", path: "/recompenses" },
-                { name: "Suggestions", path: "/suggestion" },
-                { name: "Profil", path: "/profile" }, // Lien vers Profile.js
-              ].map((link, index) => (
-                <Nav.Link
-                  key={index}
+    <div style={{ backgroundColor: "#ff6f61", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+        {/* Navbar */}
+            <Navbar expand="lg" className="shadow-sm" style={{ backgroundColor: "#ff8c7f", padding: "10px 0" }}>
+              <Container>
+                {/* Logo à gauche avec animation */}
+                <Navbar.Brand as={Link} to="/">
+                  <img
+                    src="/im18.avif"
+                    alt="Logo"
+                    style={{
+                      height: isSmallScreen ? "100px" : "150px",
+                      borderRadius: "90px",
+                      animation: "spin 6s linear infinite",
+                      marginLeft: isSmallScreen ? "-20px" : "-90px",
+                    }}
+                  />
+                </Navbar.Brand>
+      
+                {/* Titre à droite */}
+                <Navbar.Brand
                   as={Link}
-                  to={link.path}
+                  to="/"
                   style={{
-                    fontSize: "1.2rem",
-                    fontWeight: "500",
-                    color: "#fff",
-                    margin: "0 10px",
-                    transition: "all 0.3s ease",
+                    fontSize: isSmallScreen ? "1.8rem" : "2.5rem",
+                    fontWeight: "bold",
                     fontFamily: "'Comic Sans MS', cursive, sans-serif",
-                    padding: "8px 12px",
-                    borderRadius: "5px",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = "rgba(255, 165, 0, 0.5)"; // Fond orange semi-transparent
-                    e.target.style.color = "#fff"; // Texte blanc
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = "transparent"; // Fond transparent
-                    e.target.style.color = "#fff"; // Texte blanc
+                    color: "#fff",
+                    marginLeft: isSmallScreen ? "5px" : "20px",
+                    marginRight: "20px",
                   }}
                 >
-                  {link.name}
-                </Nav.Link>
-              ))}
-              {/* Bouton Connexion */}
-              <Nav.Link
-                as={Link}
-                to="/auth"
-                style={{
-                  backgroundColor: "#ff4500",
-                  borderRadius: "5px",
-                  padding: "9px 10px",
-                  color: "#fff",
-                  fontWeight: "500",
-                  transition: "background-color 0.3s",
-                  margin: "0 0px",
-                }}
-                onMouseEnter={(e) => (e.target.style.backgroundColor = "#ff9900")}
-                onMouseLeave={(e) => (e.target.style.backgroundColor = "#ff4500")}
-              >
-                Connexion
-              </Nav.Link>
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-
-        {/* Styles globaux pour l'animation du logo */}
-        <style>
-          {`
-            @keyframes spin {
-              0% {
-                transform: rotateY(0deg);
-              }
-              100% {
-                transform: rotateY(360deg);
-              }
-            }
-          `}
-        </style>
-      </Navbar>
-
+                  GoChallenges
+                </Navbar.Brand>
+      
+                {/* Bouton de bascule pour les écrans mobiles */}
+                <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ border: "none" }} />
+      
+                {/* Liens de navigation */}
+                <Navbar.Collapse id="basic-navbar-nav">
+                  <Nav className="ms-auto" style={{ alignItems: "center", marginRight: "5px" }}>
+                    {[
+                      { name: "Accueil", path: "/" },
+                      { name: "Dashbord", path: "/deadline" },
+                      { name: "Défis", path: "/categories-defis" },
+                      { name: "Récompenses", path: "/recompenses" },
+                      { name: "Suggestions", path: "/suggestion" },
+                      { name: "Profil", path: "/profile" }, // Lien vers Profile.js
+                    ].map((link, index) => (
+                      <Nav.Link
+                        key={index}
+                        as={Link}
+                        to={link.path}
+                        style={{
+                          fontSize: "1.2rem",
+                          fontWeight: "500",
+                          color: "#fff",
+                          margin: "0 10px",
+                          transition: "all 0.3s ease",
+                          fontFamily: "'Comic Sans MS', cursive, sans-serif",
+                          padding: "8px 12px",
+                          borderRadius: "5px",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = "rgba(255, 165, 0, 0.5)"; // Fond orange semi-transparent
+                          e.target.style.color = "#fff"; // Texte blanc
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = "transparent"; // Fond transparent
+                          e.target.style.color = "#fff"; // Texte blanc
+                        }}
+                      >
+                        {link.name}
+                      </Nav.Link>
+                    ))}
+                    {/* Bouton Connexion */}
+                    <Nav.Link
+                      as={Link}
+                      to="/auth"
+                      style={{
+                        backgroundColor: "#ff4500",
+                        borderRadius: "5px",
+                        padding: "12px 20px",
+                        color: "#fff",
+                        fontWeight: "500",
+                        transition: "background-color 0.3s",
+                        margin: "0 0px",
+                      }}
+                      onMouseEnter={(e) => (e.target.style.backgroundColor = "#ff9900")}
+                      onMouseLeave={(e) => (e.target.style.backgroundColor = "#ff4500")}
+                    >
+                      Connexion
+                    </Nav.Link>
+                  </Nav>
+                </Navbar.Collapse>
+              </Container>
+      
+              {/* Styles globaux pour l'animation du logo */}
+              <style>
+                {`
+                  @keyframes spin {
+                    0% {
+                      transform: rotateY(0deg);
+                    }
+                    100% {
+                      transform: rotateY(360deg);
+                    }
+                  }
+                `}
+              </style>
+            </Navbar>
       {/* Contenu principal */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          flexDirection: isSmallScreen ? "column" : "row",
-          backgroundColor: "#f5f5f5",
-          padding: isSmallScreen ? "20px 0" : "0",
-        }}
-      >
+      <div style={{
+        flex: 1,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexDirection: isSmallScreen ? "column" : "row",
+        backgroundColor: "#f5f5f5",
+        padding: isSmallScreen ? "20px 0" : "0",
+      }}>
         {/* Image pour les petits écrans */}
         {isSmallScreen && (
           <img
@@ -249,18 +289,15 @@ const AuthPage = () => {
         )}
 
         {/* Formulaire */}
-        <div
-          style={{
-            width: isSmallScreen ? "90%" : "40%",
-            maxWidth: "400px",
-            padding: "40px",
-            boxShadow: "0px 0px 20px rgba(0,0,0,0.1)",
-            borderRadius: "12px",
-            backgroundColor: "white",
-            margin: isSmallScreen ? "0 auto" : "0 3%",
-            transition: "transform 0.3s ease",
-          }}
-        >
+        <div style={{
+          width: isSmallScreen ? "90%" : "40%",
+          maxWidth: "400px",
+          padding: "40px",
+          boxShadow: "0px 0px 20px rgba(0,0,0,0.1)",
+          borderRadius: "12px",
+          backgroundColor: "white",
+          margin: isSmallScreen ? "0 auto" : "0 5%",
+        }}>
           {showSignUp ? (
             <form onSubmit={handleSignUp} style={styles.form}>
               <h2 style={styles.title}>Inscription</h2>
@@ -271,8 +308,6 @@ const AuthPage = () => {
                 onChange={(e) => setName(e.target.value)}
                 style={styles.input}
                 required
-                onMouseEnter={(e) => (e.target.style.borderColor = "#ff6f61")}
-                onMouseLeave={(e) => (e.target.style.borderColor = "#ddd")}
               />
               <input
                 type="email"
@@ -281,8 +316,6 @@ const AuthPage = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 style={styles.input}
                 required
-                onMouseEnter={(e) => (e.target.style.borderColor = "#ff6f61")}
-                onMouseLeave={(e) => (e.target.style.borderColor = "#ddd")}
               />
               <div style={styles.passwordContainer}>
                 <input
@@ -292,15 +325,12 @@ const AuthPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   style={styles.input}
                   required
-                  onMouseEnter={(e) => (e.target.style.borderColor = "#ff6f61")}
-                  onMouseLeave={(e) => (e.target.style.borderColor = "#ddd")}
+                  minLength="6"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   style={styles.togglePasswordButton}
-                  onMouseEnter={(e) => (e.target.style.color = "#ff6f61")}
-                  onMouseLeave={(e) => (e.target.style.color = "#666")}
                 >
                   {showPassword ? "🙈" : "👁️"}
                 </button>
@@ -312,23 +342,16 @@ const AuthPage = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 style={styles.input}
                 required
-                onMouseEnter={(e) => (e.target.style.borderColor = "#ff6f61")}
-                onMouseLeave={(e) => (e.target.style.borderColor = "#ddd")}
+                minLength="6"
               />
               <button
                 type="submit"
                 style={styles.button}
-                onMouseEnter={(e) => (e.target.style.backgroundColor = "#ff4500")}
-                onMouseLeave={(e) => (e.target.style.backgroundColor = "#ff6f61")}
+                disabled={loading}
               >
-                S'inscrire
+                {loading ? "Chargement..." : "S'inscrire"}
               </button>
-              <p
-                style={styles.toggleText}
-                onClick={() => setShowSignUp(false)}
-                onMouseEnter={(e) => (e.target.style.color = "#ff4500")}
-                onMouseLeave={(e) => (e.target.style.color = "#ff8c7f")}
-              >
+              <p style={styles.toggleText} onClick={() => setShowSignUp(false)}>
                 Déjà un compte ? Connectez-vous
               </p>
             </form>
@@ -336,14 +359,20 @@ const AuthPage = () => {
             <form onSubmit={handleSignIn} style={styles.form}>
               <h2 style={styles.title}>Connexion</h2>
               <input
+                type="text"
+                placeholder="Prénom"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                style={styles.input}
+                required
+              />
+              <input
                 type="email"
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 style={styles.input}
                 required
-                onMouseEnter={(e) => (e.target.style.borderColor = "#ff6f61")}
-                onMouseLeave={(e) => (e.target.style.borderColor = "#ddd")}
               />
               <div style={styles.passwordContainer}>
                 <input
@@ -353,15 +382,11 @@ const AuthPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   style={styles.input}
                   required
-                  onMouseEnter={(e) => (e.target.style.borderColor = "#ff6f61")}
-                  onMouseLeave={(e) => (e.target.style.borderColor = "#ddd")}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   style={styles.togglePasswordButton}
-                  onMouseEnter={(e) => (e.target.style.color = "#ff6f61")}
-                  onMouseLeave={(e) => (e.target.style.color = "#666")}
                 >
                   {showPassword ? "🙈" : "👁️"}
                 </button>
@@ -369,25 +394,14 @@ const AuthPage = () => {
               <button
                 type="submit"
                 style={styles.button}
-                onMouseEnter={(e) => (e.target.style.backgroundColor = "#ff4500")}
-                onMouseLeave={(e) => (e.target.style.backgroundColor = "#ff6f61")}
+                disabled={loading}
               >
-                Se connecter
+                {loading ? "Chargement..." : "Se connecter"}
               </button>
-              <p
-                style={styles.toggleText}
-                onClick={() => setShowSignUp(true)}
-                onMouseEnter={(e) => (e.target.style.color = "#ff4500")}
-                onMouseLeave={(e) => (e.target.style.color = "#ff8c7f")}
-              >
+              <p style={styles.toggleText} onClick={() => setShowSignUp(true)}>
                 Pas encore de compte ? Inscrivez-vous
               </p>
-              <p
-                style={styles.resetPassword}
-                onClick={handlePasswordReset}
-                onMouseEnter={(e) => (e.target.style.color = "#ff4500")}
-                onMouseLeave={(e) => (e.target.style.color = "#ff8c7f")}
-              >
+              <p style={styles.resetPassword} onClick={handlePasswordReset}>
                 Mot de passe oublié ?
               </p>
             </form>
@@ -403,7 +417,7 @@ const AuthPage = () => {
               width: "50%",
               height: "calc(100vh - 80px)",
               objectFit: "cover",
-              borderRadius: "15px",
+              borderRadius: "15px 0 0 15px",
             }}
           />
         )}
@@ -431,7 +445,6 @@ const AuthPage = () => {
         </Container>
       </footer>
 
-      {/* ToastContainer pour afficher les notifications */}
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -467,8 +480,11 @@ const styles = {
     border: "1px solid #ddd",
     fontSize: "16px",
     outline: "none",
-    transition: "border-color 0.3s ease, box-shadow 0.3s ease",
+    transition: "border-color 0.3s ease",
     width: "100%",
+    ":hover": {
+      borderColor: "#ff6f61",
+    },
   },
   passwordContainer: {
     display: "flex",
@@ -483,7 +499,9 @@ const styles = {
     position: "absolute",
     right: "10px",
     color: "#666",
-    transition: "color 0.3s ease",
+    ":hover": {
+      color: "#ff6f61",
+    },
   },
   button: {
     padding: "12px",
@@ -494,7 +512,15 @@ const styles = {
     fontSize: "16px",
     fontWeight: "600",
     cursor: "pointer",
-    transition: "background-color 0.3s ease, transform 0.2s ease",
+    transition: "background-color 0.3s ease",
+    width: "100%",
+    ":hover": {
+      backgroundColor: "#ff4500",
+    },
+    ":disabled": {
+      backgroundColor: "#ccc",
+      cursor: "not-allowed",
+    },
   },
   toggleText: {
     color: "#ff8c7f",
@@ -502,6 +528,9 @@ const styles = {
     cursor: "pointer",
     fontSize: "14px",
     transition: "color 0.3s ease",
+    ":hover": {
+      color: "#ff4500",
+    },
   },
   resetPassword: {
     color: "#ff8c7f",
@@ -510,28 +539,8 @@ const styles = {
     fontSize: "14px",
     marginTop: "10px",
     transition: "color 0.3s ease",
-  },
-  image: {
-    width: "50%",
-    height: "calc(100vh - 80px)",
-    objectFit: "cover",
-    borderRadius: "15px",
-  },
-  "@media (max-width: 768px)": {
-    container: {
-      flexDirection: "column",
-      height: "auto",
-      padding: "20px",
-    },
-    formContainer: {
-      width: "100%",
-      maxWidth: "none",
-      marginLeft: "0",
-      marginTop: "20px",
-    },
-    image: {
-      width: "100%",
-      height: "40vh",
+    ":hover": {
+      color: "#ff4500",
     },
   },
 };

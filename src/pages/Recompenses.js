@@ -460,18 +460,18 @@ const Recompenses = () => {
 
   return (
     <>
-    {/* Navbar */}
+     {/* Navbar */}
          <Navbar expand="lg" className="shadow-sm" style={{ backgroundColor: "#ff8c7f", padding: "10px 0" }}>
            <Container>
              {/* Logo à gauche avec animation */}
              <Navbar.Brand as={Link} to="/">
                <img
-                 src="/log.jpg"
+                 src="/im18.avif"
                  alt="Logo"
                  style={{
                    height: isSmallScreen ? "100px" : "150px",
-                   borderRadius: "55px",
-                   animation: "spin 4s linear infinite",
+                   borderRadius: "90px",
+                   animation: "spin 6s linear infinite",
                    marginLeft: isSmallScreen ? "-20px" : "-90px",
                  }}
                />
@@ -482,7 +482,7 @@ const Recompenses = () => {
                as={Link}
                to="/"
                style={{
-                 fontSize: isSmallScreen ? "1.8rem" : "2.2rem",
+                 fontSize: isSmallScreen ? "1.8rem" : "2.5rem",
                  fontWeight: "bold",
                  fontFamily: "'Comic Sans MS', cursive, sans-serif",
                  color: "#fff",
@@ -490,7 +490,7 @@ const Recompenses = () => {
                  marginRight: "20px",
                }}
              >
-               Challenge Master
+               GoChallenges
              </Navbar.Brand>
    
              {/* Bouton de bascule pour les écrans mobiles */}
@@ -540,7 +540,7 @@ const Recompenses = () => {
                    style={{
                      backgroundColor: "#ff4500",
                      borderRadius: "5px",
-                     padding: "9px 10px",
+                     padding: "12px 20px",
                      color: "#fff",
                      fontWeight: "500",
                      transition: "background-color 0.3s",
