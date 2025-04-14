@@ -35,7 +35,6 @@ import {
   FaRegCalendarCheck,
   FaCalendarPlus,
   FaRegClock
-
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
@@ -85,7 +84,6 @@ const REWARD_CONFIG = {
         { id: "fun-3", name: "Playlist Motivante", type: "fun", icon: "🎧" },
         { id: "title-3", name: "Maître Zen de l'Organisation", type: "title", icon: "🧘" },
       ],
-      
     },
     {
       level: 5,
@@ -141,7 +139,6 @@ const REWARD_CONFIG = {
     { id: "constance-13", name: "3 jours d'effort", type: "constance", icon: "💪", pointsRequired: 3 },
     { id: "constance-14", name: "20 jours de productivité", type: "constance", icon: "🔥", pointsRequired: 20 },
     { id: "constance-15", name: "30 jours sans interruption", type: "constance", icon: "🏅", pointsRequired: 30 },
-    
   ],
   seasonalRewards: [
     { id: 'seasonal-1', name: 'Explorateur d\'Hiver', type: 'hiver', icon: "❄️", season: 'winter' },
@@ -199,6 +196,7 @@ const Recompenses = () => {
   const [activeTab, setActiveTab] = useState('niveaux');
   const [isLoading, setIsLoading] = useState(true);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [showInitialConfetti, setShowInitialConfetti] = useState(true);
 
   // Fonction pour détecter la taille de l'écran
   const checkScreenSize = () => {
@@ -235,7 +233,16 @@ const Recompenses = () => {
       Math.floor(Math.random() * REWARD_CONFIG.motivationalMessages.length)
     ]);
 
-    return () => window.removeEventListener("resize", checkScreenSize);
+    // Confettis d'entrée
+    setShowInitialConfetti(true);
+    const timer = setTimeout(() => {
+      setShowInitialConfetti(false);
+    }, 5000);
+
+    return () => {
+      window.removeEventListener("resize", checkScreenSize);
+      clearTimeout(timer);
+    };
   }, []);
 
   const saveData = (newData) => {
@@ -460,135 +467,141 @@ const Recompenses = () => {
 
   return (
     <>
-     {/* Navbar */}
-         <Navbar expand="lg" className="shadow-sm" style={{ backgroundColor: "#ff8c7f", padding: "10px 0" }}>
-           <Container>
-             {/* Logo à gauche avec animation */}
-             <Navbar.Brand as={Link} to="/">
-               <img
-                 src="/im18.avif"
-                 alt="Logo"
-                 style={{
-                   height: isSmallScreen ? "100px" : "150px",
-                   borderRadius: "90px",
-                   animation: "spin 6s linear infinite",
-                   marginLeft: isSmallScreen ? "-20px" : "-90px",
-                 }}
-               />
-             </Navbar.Brand>
-   
-             {/* Titre à droite */}
-             <Navbar.Brand
-               as={Link}
-               to="/"
-               style={{
-                 fontSize: isSmallScreen ? "1.8rem" : "2.5rem",
-                 fontWeight: "bold",
-                 fontFamily: "'Comic Sans MS', cursive, sans-serif",
-                 color: "#fff",
-                 marginLeft: isSmallScreen ? "5px" : "20px",
-                 marginRight: "20px",
-               }}
-             >
-               GoChallenges
-             </Navbar.Brand>
-   
-             {/* Bouton de bascule pour les écrans mobiles */}
-             <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ border: "none" }} />
-   
-             {/* Liens de navigation */}
-             <Navbar.Collapse id="basic-navbar-nav">
-               <Nav className="ms-auto" style={{ alignItems: "center", marginRight: "5px" }}>
-                 {[
-                   { name: "Accueil", path: "/" },
-                   { name: "Dashbord", path: "/deadline" },
-                   { name: "Défis", path: "/categories-defis" },
-                   { name: "Récompenses", path: "/recompenses" },
-                   { name: "Suggestions", path: "/suggestion" },
-                   { name: "Profil", path: "/profile" }, // Lien vers Profile.js
-                 ].map((link, index) => (
-                   <Nav.Link
-                     key={index}
-                     as={Link}
-                     to={link.path}
-                     style={{
-                       fontSize: "1.2rem",
-                       fontWeight: "500",
-                       color: "#fff",
-                       margin: "0 10px",
-                       transition: "all 0.3s ease",
-                       fontFamily: "'Comic Sans MS', cursive, sans-serif",
-                       padding: "8px 12px",
-                       borderRadius: "5px",
-                     }}
-                     onMouseEnter={(e) => {
-                       e.target.style.backgroundColor = "rgba(255, 165, 0, 0.5)"; // Fond orange semi-transparent
-                       e.target.style.color = "#fff"; // Texte blanc
-                     }}
-                     onMouseLeave={(e) => {
-                       e.target.style.backgroundColor = "transparent"; // Fond transparent
-                       e.target.style.color = "#fff"; // Texte blanc
-                     }}
-                   >
-                     {link.name}
-                   </Nav.Link>
-                 ))}
-                 {/* Bouton Connexion */}
-                 <Nav.Link
-                   as={Link}
-                   to="/auth"
-                   style={{
-                     backgroundColor: "#ff4500",
-                     borderRadius: "5px",
-                     padding: "12px 20px",
-                     color: "#fff",
-                     fontWeight: "500",
-                     transition: "background-color 0.3s",
-                     margin: "0 0px",
-                   }}
-                   onMouseEnter={(e) => (e.target.style.backgroundColor = "#ff9900")}
-                   onMouseLeave={(e) => (e.target.style.backgroundColor = "#ff4500")}
-                 >
-                   Connexion
-                 </Nav.Link>
-               </Nav>
-             </Navbar.Collapse>
-           </Container>
-   
-           {/* Styles globaux pour l'animation du logo */}
-           <style>
-             {`
-               @keyframes spin {
-                 0% {
-                   transform: rotateY(0deg);
-                 }
-                 100% {
-                   transform: rotateY(360deg);
-                 }
-               }
-             `}
-           </style>
-         </Navbar>
-         <div className="cup-image-container" style={{ 
-  width: '100%', 
-  height: '600px',
-  overflow: 'hidden'
-}}>
-  <img 
-    src="/cup.avif" 
-    alt="Coupe de récompenses" 
-    style={{
-      width: '100%',
-      height: '100%',
-      objectFit: 'cover',
-      objectPosition: 'center'
-    }}
-  />
-</div>
+      {/* Navbar */}
+      <Navbar expand="lg" className="shadow-sm" style={{ backgroundColor: "#ff8c7f", padding: "10px 0" }}>
+        <Container>
+          {/* Logo à gauche avec animation */}
+          <Navbar.Brand as={Link} to="/">
+            <img
+              src="/im18.avif"
+              alt="Logo"
+              style={{
+                height: isSmallScreen ? "100px" : "150px",
+                borderRadius: "90px",
+                animation: "spin 6s linear infinite",
+                marginLeft: isSmallScreen ? "-20px" : "-90px",
+              }}
+            />
+          </Navbar.Brand>
+
+          {/* Titre à droite */}
+          <Navbar.Brand
+            as={Link}
+            to="/"
+            style={{
+              fontSize: isSmallScreen ? "1.8rem" : "2.5rem",
+              fontWeight: "bold",
+              fontFamily: "'Comic Sans MS', cursive, sans-serif",
+              color: "#fff",
+              marginLeft: isSmallScreen ? "5px" : "20px",
+              marginRight: "20px",
+            }}
+          >
+            GoChallenges
+          </Navbar.Brand>
+
+          {/* Bouton de bascule pour les écrans mobiles */}
+          <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ border: "none" }} />
+
+          {/* Liens de navigation */}
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="ms-auto" style={{ alignItems: "center", marginRight: "5px" }}>
+              {[
+                { name: "Accueil", path: "/" },
+                { name: "Dashbord", path: "/deadline" },
+                { name: "Défis", path: "/categories-defis" },
+                { name: "Récompenses", path: "/recompenses" },
+                { name: "Suggestions", path: "/suggestion" },
+                { name: "Profile", path: "/profile" },
+              ].map((link, index) => (
+                <Nav.Link
+                  key={index}
+                  as={Link}
+                  to={link.path}
+                  style={{
+                    fontSize: "1.2rem",
+                    fontWeight: "500",
+                    color: "#fff",
+                    margin: "0 10px",
+                    transition: "all 0.3s ease",
+                    fontFamily: "'Comic Sans MS', cursive, sans-serif",
+                    padding: "8px 12px",
+                    borderRadius: "5px",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "rgba(255, 165, 0, 0.5)";
+                    e.target.style.color = "#fff";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "transparent";
+                    e.target.style.color = "#fff";
+                  }}
+                >
+                  {link.name}
+                </Nav.Link>
+              ))}
+              {/* Bouton Connexion */}
+              <Nav.Link
+                as={Link}
+                to="/auth"
+                style={{
+                  backgroundColor: "#ff4500",
+                  borderRadius: "5px",
+                  padding: "12px 18px",
+                  color: "#fff",
+                  fontWeight: "500",
+                  transition: "background-color 0.3s",
+                  margin: "0 0px",
+                }}
+                onMouseEnter={(e) => (e.target.style.backgroundColor = "#ff9900")}
+                onMouseLeave={(e) => (e.target.style.backgroundColor = "#ff4500")}
+              >
+                Connexion
+              </Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+
+        {/* Styles globaux pour l'animation du logo */}
+        <style>
+          {`
+            @keyframes spin {
+              0% {
+                transform: rotateY(0deg);
+              }
+              100% {
+                transform: rotateY(360deg);
+              }
+            }
+          `}
+        </style>
+      </Navbar>
+
+      <div className="cup-image-container" style={{ 
+        width: '100%', 
+        height: '600px',
+        overflow: 'hidden'
+      }}>
+        <img 
+          src="/cup.avif" 
+          alt="Coupe de récompenses" 
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center'
+          }}
+        />
+      </div>
 
       {/* Contenu principal */}
       <Container className="recompenses-container">
+        {/* Confettis pour l'entrée sur la page */}
+        {showInitialConfetti && <Confetti recycle={false} numberOfPieces={500} />}
+        
+        {/* Confettis pour les récompenses débloquées */}
         {showConfetti && <Confetti recycle={false} numberOfPieces={500} />}
+        
         <ToastContainer />
 
         <Card className="header-card">
@@ -736,27 +749,27 @@ const Recompenses = () => {
         </Button>
       </Container>
 
-     {/* Footer */}
-          <footer style={{ backgroundColor: "#333", padding: "20px", marginTop: "50px" }}>
-            <Container className="text-center">
-              <p style={{ color: "#fff", fontSize: "1.2rem" }}>Suivez-nous sur :</p>
-              <div style={{ display: "flex", justifyContent: "center", gap: "15px" }}>
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-                  <FaFacebook size={30} color="#ffffff" />
-                </a>
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-                  <FaTwitter size={30} color="#ffffff" />
-                </a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-                  <FaInstagram size={30} color="#ffffff" />
-                </a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-                  <FaLinkedin size={30} color="#ffffff" />
-                </a>
-              </div>
-              <p style={{ color: "#fff", marginTop: "10px" }}>© 2025 GoChallenge. Tous droits réservés.</p>
-            </Container>
-          </footer>
+      {/* Footer */}
+      <footer style={{ backgroundColor: "#333", padding: "20px", marginTop: "50px" }}>
+        <Container className="text-center">
+          <p style={{ color: "#fff", fontSize: "1.2rem" }}>Suivez-nous sur :</p>
+          <div style={{ display: "flex", justifyContent: "center", gap: "15px" }}>
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+              <FaFacebook size={30} color="#ffffff" />
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+              <FaTwitter size={30} color="#ffffff" />
+            </a>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+              <FaInstagram size={30} color="#ffffff" />
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
+              <FaLinkedin size={30} color="#ffffff" />
+            </a>
+          </div>
+          <p style={{ color: "#fff", marginTop: "10px" }}>© 2025 GoChallenge. Tous droits réservés.</p>
+        </Container>
+      </footer>
     </>
   );
 };

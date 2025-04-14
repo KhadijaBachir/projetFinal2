@@ -198,7 +198,7 @@ const Profile = () => {
                     { name: "Défis", path: "/categories-defis" },
                     { name: "Récompenses", path: "/recompenses" },
                     { name: "Suggestions", path: "/suggestion" },
-                    { name: "Profil", path: "/profile" }, // Lien vers Profile.js
+                    { name: "Profile", path: "/profile" }, // Lien vers Profile.js
                   ].map((link, index) => (
                     <Nav.Link
                       key={index}
@@ -233,7 +233,7 @@ const Profile = () => {
                     style={{
                       backgroundColor: "#ff4500",
                       borderRadius: "5px",
-                      padding: "12px 20px",
+                      padding: "12px 18px",
                       color: "#fff",
                       fontWeight: "500",
                       transition: "background-color 0.3s",

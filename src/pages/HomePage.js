@@ -66,7 +66,7 @@ const HomePage = () => {
                 { name: "Défis", path: "/categories-defis" },
                 { name: "Récompenses", path: "/recompenses" },
                 { name: "Suggestions", path: "/suggestion" },
-                { name: "Profil", path: "/profile" }, // Lien vers Profile.js
+                { name: "Profile", path: "/profile" }, // Lien vers Profile.js
               ].map((link, index) => (
                 <Nav.Link
                   key={index}
@@ -101,7 +101,7 @@ const HomePage = () => {
                 style={{
                   backgroundColor: "#ff4500",
                   borderRadius: "5px",
-                  padding: "12px 20px",
+                  padding: "12px 18px",
                   color: "#fff",
                   fontWeight: "500",
                   transition: "background-color 0.3s",
@@ -213,7 +213,7 @@ const HomePage = () => {
         <Row className="justify-content-center">
           <Col md={8}>
             <h1 className="mb-4" style={{ fontSize: "3rem", fontWeight: "bold", color: "#fff" }}>
-              Bienvenue sur GoChallenge
+              Bienvenue sur GoChallenges
             </h1>
             <p className="lead" style={{ fontSize: "1.5rem", color: "#fff" }}>
               Défiez-vous, gagnez des points et débloquez des récompenses !
@@ -286,7 +286,7 @@ const HomePage = () => {
               <FaLinkedin size={30} color="#ffffff" />
             </a>
           </div>
-          <p style={{ color: "#fff", marginTop: "10px" }}>© 2025 GoChallenge. Tous droits réservés.</p>
+          <p style={{ color: "#fff", marginTop: "10px" }}>© 2025 GoChallenges. Tous droits réservés.</p>
         </Container>
       </footer>
     </div>
