@@ -13,7 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import confetti from 'canvas-confetti';
 import '../CategoryDetails.css';
 
-const bienetreImagePath = '/fff.jpg';
+const bienetreImagePath = '/pousse.jpg';
 
 // Ajoutez ce composant juste ici
 const ChallengeIcon = ({ icon, color }) => {
@@ -452,7 +452,7 @@ const TacheRepousse = () => {
           fontSize: isSmallScreen ? "2rem" : "2.5rem",
           textShadow: "2px 2px 4px rgba(0,0,0,0.5)"
         }}>
-          Défis Tache-Repoussés
+          Défis Tâches-Repoussées
         </h1>
 
         {/* Défis par défaut */}
@@ -520,7 +520,7 @@ const TacheRepousse = () => {
         </Row>
 
         {/* Défis utilisateur */}
-        <h2 className="section-title">Mes Défis Tache-Repoussés</h2>
+        <h2 className="section-title">Mes Défis Tâches-Repoussées</h2>
         <Row>
           {userChallenges.map((challenge) => (
             <Col md={4} key={challenge.id} className="mb-4">
@@ -600,7 +600,7 @@ const TacheRepousse = () => {
           <Col md={6} className="mx-auto">
             <Card className="form-card">
               <Card.Body>
-                <h3 className="text-center">Ajouter un défi tache-repoussé</h3>
+                <h3 className="text-center">Ajouter un défi tâche-repoussée</h3>
                 <Form>
                   <Form.Group className="mb-3">
                     <Form.Control 

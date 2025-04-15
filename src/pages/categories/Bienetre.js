@@ -13,7 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import confetti from 'canvas-confetti';
 import '../CategoryDetails.css';
 
-const bienetreImagePath = '/bienetre1.jpg';
+const bienetreImagePath = '/bibi.avif';
 
 // Ajoutez ce composant juste ici
 const ChallengeIcon = ({ icon, color }) => {
@@ -82,8 +82,8 @@ const Bienetre = () => {
     const baseChallenges = [
       {
         id: "jJBBAFqqbIiBsVp1ghow",
-        name: "Méditation",
-        description: "10 minutes de méditation",
+        name: "Aller à la plage",
+        description: "profiter de la vie",
         icon: "FaSmile",
         points: 5
       },
@@ -96,7 +96,7 @@ const Bienetre = () => {
       },
       {
         id: " EUT7aqCDPeFKlAEX0zZU ",
-        name: " Méditer 10 minutes par jour",
+        name: " Méditation",
         description: "Spiritualité",
         icon: "FaSmile",
         points: 5

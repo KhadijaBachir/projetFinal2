@@ -307,7 +307,16 @@ const CategoriesList = () => {
       <img
         src="/x.webp"
         alt="Bannière"
-        style={styles.bannerImage}
+        style={{
+          width: "100%",
+          height: "600px",
+          objectFit: "cover",
+          objectPosition: "center",
+          display: "block",
+          margin: "0",
+          borderRadius: "0",
+         
+        }}
       />
 
       {/* Contenu principal */}

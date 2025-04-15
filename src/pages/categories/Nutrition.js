@@ -13,7 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import confetti from 'canvas-confetti';
 import '../CategoryDetails.css';
 
-const bienetreImagePath = '/nutrition.jpg';
+const bienetreImagePath = '/nut.webp';
 
 // Ajoutez ce composant juste ici
 const ChallengeIcon = ({ icon, color }) => {

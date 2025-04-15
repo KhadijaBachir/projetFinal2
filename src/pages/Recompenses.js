@@ -583,7 +583,7 @@ const Recompenses = () => {
         overflow: 'hidden'
       }}>
         <img 
-          src="/cup.avif" 
+          src="/kk.jpg" 
           alt="Coupe de récompenses" 
           style={{
             width: '100%',

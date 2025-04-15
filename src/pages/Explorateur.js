@@ -402,7 +402,7 @@ const Explorateur = () => {
         overflow: "hidden"
       }}>
         <img
-          src="/chal.webp" 
+          src="/bel.jpg" 
           alt="Bannière de défis"
           style={{
             width: "100%",

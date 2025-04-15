@@ -3,20 +3,19 @@ import { Container, Row, Col, Button, Card, Carousel, Navbar, Nav } from "react-
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import './Recompenses.css'; 
+import './Recompenses.css';
+
 const HomePage = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
-  // Fonction pour détecter la taille de l'écran
   const checkScreenSize = () => {
-    setIsSmallScreen(window.innerWidth <= 768); // 768px est la taille typique pour les petits écrans
+    setIsSmallScreen(window.innerWidth <= 768);
   };
 
-  // Ajouter un écouteur d'événement pour détecter les changements de taille d'écran
   useEffect(() => {
-    checkScreenSize(); // Vérifier la taille initiale
-    window.addEventListener("resize", checkScreenSize); // Mettre à jour lors du redimensionnement
-    return () => window.removeEventListener("resize", checkScreenSize); // Nettoyer l'écouteur
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
   return (
@@ -24,7 +23,6 @@ const HomePage = () => {
       {/* Navbar */}
       <Navbar expand="lg" className="shadow-sm" style={{ backgroundColor: "#ff8c7f", padding: "10px 0" }}>
         <Container>
-          {/* Logo à gauche avec animation */}
           <Navbar.Brand as={Link} to="/">
             <img
               src="/im18.avif"
@@ -38,7 +36,6 @@ const HomePage = () => {
             />
           </Navbar.Brand>
 
-          {/* Titre à droite */}
           <Navbar.Brand
             as={Link}
             to="/"
@@ -54,10 +51,8 @@ const HomePage = () => {
             GoChallenges
           </Navbar.Brand>
 
-          {/* Bouton de bascule pour les écrans mobiles */}
           <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ border: "none" }} />
 
-          {/* Liens de navigation */}
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto" style={{ alignItems: "center", marginRight: "5px" }}>
               {[
@@ -66,7 +61,7 @@ const HomePage = () => {
                 { name: "Défis", path: "/categories-defis" },
                 { name: "Récompenses", path: "/recompenses" },
                 { name: "Suggestions", path: "/suggestion" },
-                { name: "Profile", path: "/profile" }, // Lien vers Profile.js
+                { name: "Profile", path: "/profile" },
               ].map((link, index) => (
                 <Nav.Link
                   key={index}
@@ -83,18 +78,17 @@ const HomePage = () => {
                     borderRadius: "5px",
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = "rgba(255, 165, 0, 0.5)"; // Fond orange semi-transparent
-                    e.target.style.color = "#fff"; // Texte blanc
+                    e.target.style.backgroundColor = "rgba(255, 165, 0, 0.5)";
+                    e.target.style.color = "#fff";
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = "transparent"; // Fond transparent
-                    e.target.style.color = "#fff"; // Texte blanc
+                    e.target.style.backgroundColor = "transparent";
+                    e.target.style.color = "#fff";
                   }}
                 >
                   {link.name}
                 </Nav.Link>
               ))}
-              {/* Bouton Connexion */}
               <Nav.Link
                 as={Link}
                 to="/auth"
@@ -116,16 +110,11 @@ const HomePage = () => {
           </Navbar.Collapse>
         </Container>
 
-        {/* Styles globaux pour l'animation du logo */}
         <style>
           {`
             @keyframes spin {
-              0% {
-                transform: rotateY(0deg);
-              }
-              100% {
-                transform: rotateY(360deg);
-              }
+              0% { transform: rotateY(0deg); }
+              100% { transform: rotateY(360deg); }
             }
           `}
         </style>
@@ -133,8 +122,24 @@ const HomePage = () => {
 
       {/* Contenu principal */}
       <Container className="text-center pt-5" style={{ paddingTop: "100px" }}>
-        {/* Carrousel d'images */}
-        <Carousel className="mb-4">
+        {/* Carrousel avec transition de 2 secondes */}
+        <Carousel 
+          className="mb-4"
+          interval={2000}  // Changement toutes les 2 secondes
+          fade={true}     // Effet de fondu
+        >
+          <Carousel.Item>
+            <img
+              className="d-block w-100"
+              src="/imm.jpg"
+              alt="Défi et motivation"
+              style={{ maxHeight: "700px", objectFit: "cover", borderRadius: "15px" }}
+            />
+            <Carousel.Caption>
+              <h3 style={{ fontSize: "2rem", fontWeight: "bold", color: "#fff" }}>Relevez des défis</h3>
+              <p style={{ fontSize: "1.2rem", color: "#fff" }}>Testez vos compétences et dépassez vos limites !</p>
+            </Carousel.Caption>
+          </Carousel.Item>
           <Carousel.Item>
             <img
               className="d-block w-100"
@@ -187,18 +192,6 @@ const HomePage = () => {
             <img
               className="d-block w-100"
               src="/im4.jpg"
-              alt="Défi et motivation"
-              style={{ maxHeight: "700px", objectFit: "cover", borderRadius: "15px" }}
-            />
-            <Carousel.Caption>
-              <h3 style={{ fontSize: "2rem", fontWeight: "bold", color: "#fff" }}>Relevez des défis</h3>
-              <p style={{ fontSize: "1.2rem", color: "#fff" }}>Testez vos compétences et dépassez vos limites !</p>
-            </Carousel.Caption>
-          </Carousel.Item>
-          <Carousel.Item>
-            <img
-              className="d-block w-100"
-              src="/im17.jpg"
               alt="Défi et motivation"
               style={{ maxHeight: "700px", objectFit: "cover", borderRadius: "15px" }}
             />
