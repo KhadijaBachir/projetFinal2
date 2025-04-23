@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Confetti from 'react-confetti';
-import { FaCheck, FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaSignOutAlt, FaLock, FaUnlock } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { FaCheck, FaLock, FaUnlock } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import confetti from 'canvas-confetti';
+import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
 
 // Défis et récompenses
 const CHALLENGES = {
@@ -80,25 +80,11 @@ const MOTIVATION = {
     "https://www.youtube.com/embed/oXcxDoab4ro",
     "https://www.youtube.com/embed/KRbCdd8eGow",
     "https://www.youtube.com/embed/D6qTPTj9g3I",
-    "https://www.youtube.com/embed/oXcxDoab4ro",
-    "https://www.youtube.com/embed/KRbCdd8eGow",
-    "https://www.youtube.com/embed/D6qTPTj9g3I",
     "https://www.youtube.com/embed/qZcdiUqJjKw",
     "https://www.youtube.com/embed/loZ6PTeqcHM",
-    "https://www.youtube.com/embed/or91sy5yk8",
     "https://www.youtube.com/embed/0UpjBtfiet4",
-    "https://www.youtube.com/embed/=RzakMIZJ0YI",
-    "https://www.youtube.com/embed/kkbSY_1JuP8",
-    "https://www.youtube.com/embed/RNiGMrdElPw",
-    "https://www.youtube.com/embed/1ujwZKjs-pQ",
-    "https://www.youtube.com/embed/gyc_rOe8DcE",
-    "https://www.youtube.com/embed/leo15qrGx_o",    
-    "https://www.youtube.com/embed/-NffRBbULDE",
-    "https://www.youtube.com/embed/Bw6tW08eOhs",
-    "https://www.youtube.com/embed/7PA6SX4w5F8",
-    "https://www.youtube.com/embed/5pP53OfR3hs",
-    "https://www.youtube.com/embed/IxPoeXOnGkU",
-    "https://www.youtube.com/embed/KJED_W79V14"
+    "https://www.youtube.com/embed/RzakMIZJ0YI",
+    "https://www.youtube.com/embed/kkbSY_1JuP8"
   ]
 };
 
@@ -116,11 +102,27 @@ const Explorateur = () => {
   const [dailyProgress, setDailyProgress] = useState({ date: "", count: 0 });
   const [unlockedRewards, setUnlockedRewards] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [flippedCards, setFlippedCards] = useState({});
-  const navigate = useNavigate();
+  const [showReward, setShowReward] = useState(false);
+  const [currentChallenges, setCurrentChallenges] = useState([]);
+  const [lastUpdate, setLastUpdate] = useState(null);
+  const [usedVideos, setUsedVideos] = useState([]);
+  const [currentVideo, setCurrentVideo] = useState("");
+  const [videoKey, setVideoKey] = useState(0);
+  const iframeRef = useRef(null);
 
-  // Vérifie si c'est un nouveau jour
+  const triggerConfetti = () => {
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  };
+
+  const getRandomMotivationPhrase = () => {
+    return MOTIVATION.phrases[Math.floor(Math.random() * MOTIVATION.phrases.length)];
+  };
+
   const isNewDay = (lastUpdated) => {
     if (!lastUpdated) return true;
     const now = new Date();
@@ -132,17 +134,47 @@ const Explorateur = () => {
     );
   };
 
-  // Génère de nouveaux défis
-  const generateNewChallenges = () => {
-    const newChallenges = {};
-    Object.keys(CHALLENGES).forEach(category => {
-      const randomIndex = Math.floor(Math.random() * CHALLENGES[category].length);
-      newChallenges[category] = CHALLENGES[category][randomIndex];
-    });
-    return newChallenges;
+  const getRandomChallenge = (category) => {
+    const challenges = CHALLENGES[category];
+    return challenges[Math.floor(Math.random() * challenges.length)];
   };
 
-  // Gestion du flip des cartes
+  const saveToLocalStorage = (challenges, completed, updateDate, reward, usedVids, video) => {
+    const data = {
+      currentChallenges: challenges,
+      completedChallenges: completed,
+      lastUpdate: updateDate,
+      showReward: reward,
+      usedVideos: usedVids,
+      currentVideo: video
+    };
+    localStorage.setItem('explorateurData', JSON.stringify(data));
+  };
+
+  const generateNewChallenges = () => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+    const newChallenges = Object.keys(CHALLENGES).map(category => ({
+      category,
+      ...getRandomChallenge(category)
+    }));
+
+    setCurrentChallenges(newChallenges);
+    setDailyChallenges(newChallenges.reduce((acc, challenge) => {
+      acc[challenge.category] = challenge;
+      return acc;
+    }, {}));
+    setCompleted([]);
+    setDailyProgress({ date: today, count: 0 });
+    setUnlockedRewards(false);
+    setShowReward(false);
+    setFlippedCards({});
+    setCurrentVideo("");
+    setVideoKey(prev => prev + 1);
+    saveToLocalStorage(newChallenges, [], today, false, usedVideos, "");
+  };
+
   const toggleFlip = (category) => {
     setFlippedCards(prev => ({
       ...prev,
@@ -150,53 +182,44 @@ const Explorateur = () => {
     }));
   };
 
-  // Initialisation et vérification quotidienne
   useEffect(() => {
     const checkAndUpdateChallenges = () => {
-      const today = new Date().toDateString();
-      const savedData = JSON.parse(localStorage.getItem('challengeAppData')) || {};
-      
-      if (isNewDay(savedData.lastUpdated)) {
-        const newChallenges = generateNewChallenges();
-        const newData = {
-          challenges: newChallenges,
-          completed: [],
-          progress: { date: today, count: 0 },
-          rewardsUnlocked: false,
-          lastUpdated: today
-        };
-        
-        localStorage.setItem('challengeAppData', JSON.stringify(newData));
-        setDailyChallenges(newChallenges);
-        setCompleted([]);
-        setDailyProgress({ date: today, count: 0 });
-        setUnlockedRewards(false);
-        setFlippedCards({});
-        
-        if (savedData.lastUpdated) {
-          toast.info("🎉 Nouveaux défis disponibles pour aujourd'hui !");
+      const storedData = localStorage.getItem('explorateurData');
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+      if (storedData) {
+        const data = JSON.parse(storedData);
+        const lastUpdateDate = new Date(data.lastUpdate).getTime();
+
+        if (isNewDay(data.lastUpdate)) {
+          generateNewChallenges();
+        } else {
+          setCurrentChallenges(data.currentChallenges);
+          setDailyChallenges(data.currentChallenges.reduce((acc, challenge) => {
+            acc[challenge.category] = challenge;
+            return acc;
+          }, {}));
+          setCompleted(data.completedChallenges || []);
+          setDailyProgress({ date: today, count: data.completedChallenges?.length || 0 });
+          setUnlockedRewards(data.showReward || false);
+          setShowReward(data.showReward || false);
+          setLastUpdate(data.lastUpdate);
+          setUsedVideos(data.usedVideos || []);
+          setCurrentVideo(data.currentVideo || "");
         }
       } else {
-        setDailyChallenges(savedData.challenges || {});
-        setCompleted(savedData.completed || []);
-        setDailyProgress(savedData.progress || { date: "", count: 0 });
-        setUnlockedRewards(savedData.rewardsUnlocked || false);
+        generateNewChallenges();
       }
     };
 
-    // Vérifier immédiatement
     checkAndUpdateChallenges();
     
-    // Configurer une vérification périodique (toutes les minutes)
     const interval = setInterval(checkAndUpdateChallenges, 60000);
     
-    // Vérification de la taille de l'écran
     const checkScreenSize = () => setIsSmallScreen(window.innerWidth <= 768);
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
-    
-    // Connexion utilisateur
-    setIsLoggedIn(!!localStorage.getItem('authToken'));
     
     return () => {
       clearInterval(interval);
@@ -204,26 +227,42 @@ const Explorateur = () => {
     };
   }, []);
 
-  // Compléter un défi
   const completeChallenge = (category, challenge, e) => {
     e.stopPropagation();
-    const today = new Date().toDateString();
+    const today = new Date().getTime();
     const challengeId = `${category}-${challenge.text}`;
     
     if (!completed.includes(challengeId)) {
       const newCompleted = [...completed, challengeId];
-      const newCount = dailyProgress.count + 1;
+      const newCount = newCompleted.length;
       const rewardsUnlocked = newCount >= 4;
       
+      let newVideo = currentVideo;
+      if (rewardsUnlocked && !unlockedRewards) {
+        const availableVideos = MOTIVATION.videos.filter(v => !usedVideos.includes(v));
+        
+        if (availableVideos.length === 0) {
+          setUsedVideos([]);
+          newVideo = MOTIVATION.videos[0];
+        } else {
+          newVideo = availableVideos[Math.floor(Math.random() * availableVideos.length)];
+        }
+        
+        setCurrentVideo(newVideo);
+        setUsedVideos(prev => [...prev, newVideo]);
+        setVideoKey(prev => prev + 1);
+      }
+
       const updatedData = {
-        challenges: dailyChallenges,
-        completed: newCompleted,
-        progress: { date: today, count: newCount },
-        rewardsUnlocked,
-        lastUpdated: today
+        currentChallenges: currentChallenges,
+        completedChallenges: newCompleted,
+        lastUpdate: today,
+        showReward: rewardsUnlocked,
+        usedVideos: [...usedVideos, newVideo],
+        currentVideo: newVideo
       };
       
-      localStorage.setItem('challengeAppData', JSON.stringify(updatedData));
+      localStorage.setItem('explorateurData', JSON.stringify(updatedData));
       
       setCompleted(newCompleted);
       setDailyProgress(prev => ({ ...prev, count: newCount }));
@@ -233,28 +272,25 @@ const Explorateur = () => {
       
       if (rewardsUnlocked && !unlockedRewards) {
         setUnlockedRewards(true);
+        setShowReward(true);
         toast.info("🎉 Vous avez débloqué vos récompenses quotidiennes !");
-        triggerConfetti(); // Confetti seulement quand l'utilisateur débloque les récompenses
+        triggerConfetti();
       }
     }
   };
 
-  const triggerConfetti = () => {
-    confetti({
-      particleCount: 150,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
-  };
+  useEffect(() => {
+    if (showReward && iframeRef.current && currentVideo) {
+      const timer = setTimeout(() => {
+        if (iframeRef.current) {
+          iframeRef.current.src = `${currentVideo}?autoplay=1&rel=0&mute=1`;
+        }
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [showReward, currentVideo]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    setIsLoggedIn(false);
-    navigate('/auth');
-    toast.info("Vous avez été déconnecté avec succès");
-  };
-
-  // Animations
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -281,121 +317,107 @@ const Explorateur = () => {
     <div style={{ 
       backgroundColor: "#ff6f61", 
       minHeight: "100vh",
-      overflowX: 'hidden',
-      width: '100%',
-      position: 'relative'
+      overflowX: 'hidden'
     }}>
-            {/* Navbar */}
-            <Navbar expand="lg" className="shadow-sm" style={{ backgroundColor: "#ff8c7f", padding: "10px 0" }}>
-              <Container>
-                {/* Logo à gauche avec animation */}
-                <Navbar.Brand as={Link} to="/">
-                  <img
-                    src="/im18.avif"
-                    alt="Logo"
-                    style={{
-                      height: isSmallScreen ? "100px" : "150px",
-                      borderRadius: "90px",
-                      animation: "spin 6s linear infinite",
-                      marginLeft: isSmallScreen ? "-20px" : "-90px",
-                    }}
-                  />
-                </Navbar.Brand>
-      
-                {/* Titre à droite */}
-                <Navbar.Brand
+ {/* Navbar */}
+      <Navbar expand="lg" className="shadow-sm" style={{ backgroundColor: "#ff8c7f", padding: "10px 0" }}>
+        <Container>
+          <Navbar.Brand as={Link} to="/">
+            <img
+              src="/im18.avif"
+              alt="Logo"
+              style={{
+                height: isSmallScreen ? "100px" : "150px",
+                borderRadius: "90px",
+                animation: "spin 6s linear infinite",
+                marginLeft: isSmallScreen ? "-20px" : "-90px",
+              }}
+            />
+          </Navbar.Brand>
+
+          <Navbar.Brand
+            as={Link}
+            to="/"
+            style={{
+              fontSize: isSmallScreen ? "1.8rem" : "2.5rem",
+              fontWeight: "bold",
+              fontFamily: "'Comic Sans MS', cursive, sans-serif",
+              color: "#fff",
+              marginLeft: isSmallScreen ? "5px" : "20px",
+              marginRight: "20px",
+            }}
+          >
+            GoChallenges
+          </Navbar.Brand>
+
+          <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ border: "none" }} />
+
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="ms-auto" style={{ alignItems: "center", marginRight: "5px" }}>
+              {[
+                { name: "Accueil", path: "/" },
+                { name: "Dashbord", path: "/deadline" },
+                { name: "Défis", path: "/categories-defis" },
+                { name: "Récompenses", path: "/recompenses" },
+                { name: "Suggestions", path: "/suggestion" },
+                { name: "Profile", path: "/profile" },
+              ].map((link, index) => (
+                <Nav.Link
+                  key={index}
                   as={Link}
-                  to="/"
+                  to={link.path}
                   style={{
-                    fontSize: isSmallScreen ? "1.8rem" : "2.5rem",
-                    fontWeight: "bold",
-                    fontFamily: "'Comic Sans MS', cursive, sans-serif",
+                    fontSize: "1.2rem",
+                    fontWeight: "500",
                     color: "#fff",
-                    marginLeft: isSmallScreen ? "5px" : "20px",
-                    marginRight: "20px",
+                    margin: "0 10px",
+                    transition: "all 0.3s ease",
+                    fontFamily: "'Comic Sans MS', cursive, sans-serif",
+                    padding: "8px 12px",
+                    borderRadius: "5px",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "rgba(255, 165, 0, 0.5)";
+                    e.target.style.color = "#fff";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "transparent";
+                    e.target.style.color = "#fff";
                   }}
                 >
-                  GoChallenges
-                </Navbar.Brand>
-      
-                {/* Bouton de bascule pour les écrans mobiles */}
-                <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ border: "none" }} />
-      
-                {/* Liens de navigation */}
-                <Navbar.Collapse id="basic-navbar-nav">
-                  <Nav className="ms-auto" style={{ alignItems: "center", marginRight: "5px" }}>
-                    {[
-                      { name: "Accueil", path: "/" },
-                      { name: "Dashbord", path: "/deadline" },
-                      { name: "Défis", path: "/categories-defis" },
-                      { name: "Récompenses", path: "/recompenses" },
-                      { name: "Suggestions", path: "/suggestion" },
-                      { name: "Profile", path: "/profile" }, // Lien vers Profile.js
-                    ].map((link, index) => (
-                      <Nav.Link
-                        key={index}
-                        as={Link}
-                        to={link.path}
-                        style={{
-                          fontSize: "1.2rem",
-                          fontWeight: "500",
-                          color: "#fff",
-                          margin: "0 10px",
-                          transition: "all 0.3s ease",
-                          fontFamily: "'Comic Sans MS', cursive, sans-serif",
-                          padding: "8px 12px",
-                          borderRadius: "5px",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.backgroundColor = "rgba(255, 165, 0, 0.5)"; // Fond orange semi-transparent
-                          e.target.style.color = "#fff"; // Texte blanc
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.backgroundColor = "transparent"; // Fond transparent
-                          e.target.style.color = "#fff"; // Texte blanc
-                        }}
-                      >
-                        {link.name}
-                      </Nav.Link>
-                    ))}
-                    {/* Bouton Connexion */}
-                    <Nav.Link
-                      as={Link}
-                      to="/auth"
-                      style={{
-                        backgroundColor: "#ff4500",
-                        borderRadius: "5px",
-                        padding: "12px 18px",
-                        color: "#fff",
-                        fontWeight: "500",
-                        transition: "background-color 0.3s",
-                        margin: "0 0px",
-                      }}
-                      onMouseEnter={(e) => (e.target.style.backgroundColor = "#ff9900")}
-                      onMouseLeave={(e) => (e.target.style.backgroundColor = "#ff4500")}
-                    >
-                      Connexion
-                    </Nav.Link>
-                  </Nav>
-                </Navbar.Collapse>
-              </Container>
-      
-              {/* Styles globaux pour l'animation du logo */}
-              <style>
-                {`
-                  @keyframes spin {
-                    0% {
-                      transform: rotateY(0deg);
-                    }
-                    100% {
-                      transform: rotateY(360deg);
-                    }
-                  }
-                `}
-              </style>
-            </Navbar>
-      
-      {/* Bannière */}
+                  {link.name}
+                </Nav.Link>
+              ))}
+              <Nav.Link
+                as={Link}
+                to="/auth"
+                style={{
+                  backgroundColor: "#ff4500",
+                  borderRadius: "5px",
+                  padding: "12px 18px",
+                  color: "#fff",
+                  fontWeight: "500",
+                  transition: "background-color 0.3s",
+                  margin: "0 0px",
+                }}
+                onMouseEnter={(e) => (e.target.style.backgroundColor = "#ff9900")}
+                onMouseLeave={(e) => (e.target.style.backgroundColor = "#ff4500")}
+              >
+                Connexion
+              </Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+
+        <style>
+          {`
+            @keyframes spin {
+              0% { transform: rotateY(0deg); }
+              100% { transform: rotateY(360deg); }
+            }
+          `}
+        </style>
+      </Navbar>     
       <div style={{
         width: "100%",
         height: "600px",
@@ -413,7 +435,6 @@ const Explorateur = () => {
         />
       </div>
 
-      {/* Contenu principal */}
       <Container style={{ 
         padding: "20px 15px",
         maxWidth: '100%',
@@ -438,7 +459,7 @@ const Explorateur = () => {
           initial="hidden"
           animate="visible"
           className="row justify-content-center"
-          style={{ margin: '0 -8px', padding: '0 50px'  }}
+          style={{ margin: '0 -8px', padding: '0 50px' }}
         >
           {Object.keys(CHALLENGES).map((category, index) => {
             const challenge = dailyChallenges[category];
@@ -474,7 +495,6 @@ const Explorateur = () => {
                   }}
                   onClick={() => toggleFlip(category)}
                 >
-                  {/* Face avant */}
                   <div style={{
                     position: "absolute",
                     backfaceVisibility: "hidden",
@@ -505,7 +525,6 @@ const Explorateur = () => {
                     </h3>
                   </div>
                   
-                  {/* Face arrière */}
                   <div style={{
                     position: "absolute",
                     backfaceVisibility: "hidden",
@@ -520,8 +539,8 @@ const Explorateur = () => {
                   }}>
                     <div style={{ fontSize: "2.2rem" }}>
                       {category === "DefiDuJour" ? "☀️" : 
-                       category === "DefiSurprise" ? "🎁" :
-                       category === "RouletteDesDefis" ? "🎡" : "🎨"}
+                      category === "DefiSurprise" ? "🎁" :
+                      category === "RouletteDesDefis" ? "🎡" : "🎨"}
                     </div>
 
                     <h3 
@@ -538,8 +557,8 @@ const Explorateur = () => {
                     
                     <motion.button
                       style={{ 
-                        backgroundColor: color.bg,
-                        color: color.text,
+                        backgroundColor: color.text,
+                        color: color.bg,
                         border: "none",
                         borderRadius: "20px",
                         padding: "8px 10px",
@@ -580,67 +599,115 @@ const Explorateur = () => {
           })}
         </motion.div>
 
-        {/* Section Récompenses */}
-        <motion.div
-          className="mt-5"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          style={{ width: '100%' }}
-        >
-          <div className="d-flex align-items-center mb-3">
-            <h2 style={{ 
-              color: "#fff", 
-              fontFamily: "'Comic Sans MS', cursive",
-              marginRight: "10px",
-              padding: '0 50px',
-              fontSize: isSmallScreen ? "1.5rem" : "1.8rem"
-            }}>
-              Récompenses Débloquées
-            </h2>
-            {unlockedRewards ? (
-              <FaUnlock style={{ color: "#4ECDC4", fontSize: "1.5rem" }} />
-            ) : (
-              <FaLock style={{ color: "#FF6B6B", fontSize: "1.5rem" }} />
-            )}
-          </div>
-
-          {unlockedRewards ? (
-            <>
-              <div className="p-4 mb-4" style={{ 
-                backgroundColor: "rgba(255,255,255,0.9)", 
-                borderRadius: "15px",
-                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                margin: "0 50px"
+        {/* Section Récompenses - Afficher en dessous si débloquée */}
+        {showReward && (
+          <motion.div
+            className="mt-5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            <div className="d-flex align-items-center mb-3">
+              <h2 style={{ 
+                color: "#fff", 
+                fontFamily: "'Comic Sans MS', cursive",
+                marginRight: "10px",
+                fontSize: isSmallScreen ? "1.5rem" : "1.8rem"
               }}>
-                <h3 className="text-center mb-3" style={{ color: "#ff6f61" }}>
-                  Message Motivant
-                </h3>
-                <p className="text-center" style={{ fontSize: "1.1rem" }}>
-                  {MOTIVATION.phrases[Math.floor(Math.random() * MOTIVATION.phrases.length)]}
+                Récompenses Débloquées
+              </h2>
+              <FaUnlock style={{ color: "#4ECDC4", fontSize: "1.5rem" }} />
+            </div>
+
+            <div className="reward-section" style={{
+              backgroundColor: "#ff8c7f",
+              borderRadius: "15px",
+              padding: "30px",
+              marginBottom: "30px",
+              textAlign: "center"
+            }}>
+              <h3 style={{ 
+                color: "#6f42c1",
+                fontFamily: "'Comic Sans MS', cursive",
+                marginBottom: "20px"
+              }}>
+                Votre récompense du jour
+              </h3>
+              
+              <div style={{
+                backgroundColor: "rgba(111, 66, 193, 0.1)",
+                padding: "20px",
+                borderRadius: "10px",
+                marginBottom: "25px",
+                borderLeft: "5px solid #6f42c1"
+              }}>
+                <p style={{
+                  color: "#ffff",
+                  fontSize: "1.2rem",
+                  fontStyle: "italic",
+                  marginBottom: "0",
+                  fontFamily: "'Comic Sans MS', cursive"
+                }}>
+                  {getRandomMotivationPhrase()}
                 </p>
               </div>
-
-              <div className="ratio ratio-16x9 mb-4" style={{ 
-                borderRadius: "15px",
+              
+              <div className="video-container" style={{
+                margin: "20px auto",
+                borderRadius: "10px",
                 overflow: "hidden",
-                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                margin: "0 50px",
-                 width: "calc(100% - 100px)"
+                maxWidth: "800px",
+                width: "100%",
+                minHeight: "450px"
               }}>
-                <iframe 
-                  src={MOTIVATION.videos[Math.floor(Math.random() * MOTIVATION.videos.length)]} 
-                  title="Récompense motivationnelle"
-                  allowFullScreen
-                  style={{ border: 'none' }}
-                />
+                <div style={{
+                  position: "relative",
+                  paddingBottom: "56.25%",
+                  height: 0
+                }}>
+                  <iframe 
+                    ref={iframeRef}
+                    key={`video-${videoKey}`}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      border: "none"
+                    }}
+                    src={currentVideo ? `${currentVideo}?autoplay=1&rel=0&mute=1` : ""}
+                    title="Motivation video"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    frameBorder="0"
+                  />
+                </div>
               </div>
+            </div>
+          </motion.div>
+        )}
 
-              <p className="text-center text-white" style={{ fontSize: "1.1rem" }}>
-                Ces récompenses resteront disponibles jusqu'à demain !
-              </p>
-            </>
-          ) : (
+        {/* Section Progression - Afficher seulement si les récompenses ne sont pas débloquées */}
+        {!showReward && (
+          <motion.div
+            className="mt-5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            <div className="d-flex align-items-center mb-3">
+              <h2 style={{ 
+                color: "#fff", 
+                fontFamily: "'Comic Sans MS', cursive",
+                marginRight: "10px",
+                fontSize: isSmallScreen ? "1.5rem" : "1.8rem"
+              }}>
+                Récompenses
+              </h2>
+              <FaLock style={{ color: "#FF6B6B", fontSize: "1.5rem" }} />
+            </div>
+
             <div className="p-4 text-center" style={{ 
               backgroundColor: "rgba(255,255,255,0.2)", 
               borderRadius: "15px",
@@ -665,35 +732,10 @@ const Explorateur = () => {
                 ))}
               </div>
             </div>
-          )}
-        </motion.div>
+          </motion.div>
+        )}
       </Container>
-
-      {/* Footer */}
-      <footer className="py-4 mt-5" style={{ 
-        backgroundColor: "#333",
-        width: '100%'
-      }}>
-        <Container className="text-center">
-          <div className="d-flex justify-content-center gap-4 mb-3">
-            {[FaFacebook, FaTwitter, FaInstagram, FaLinkedin].map((Icon, i) => (
-              <motion.a
-                key={i}
-                href="#"
-                style={{ color: "#fff", fontSize: "1.3rem" }}
-                whileHover={{ y: -3, color: "#4ECDC4" }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <Icon />
-              </motion.a>
-            ))}
-          </div>
-          <p style={{ color: "#fff", marginBottom: "0", fontSize: "0.9rem" }}>
-            © {new Date().getFullYear()} Challenge Master. Tous droits réservés.
-          </p>
-        </Container>
-      </footer>
-
+      
       <ToastContainer 
         position="bottom-right"
         autoClose={3000}
@@ -704,18 +746,38 @@ const Explorateur = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        style={{ width: 'auto', maxWidth: '100%' }}
       />
 
-      <style>
-        {`
-          body {
-            overflow-x: hidden;
-          }
-        `}
-      </style>
+      {/* Footer */}
+      <footer style={{ 
+        backgroundColor: "#333", 
+        padding: "20px", 
+        marginTop: "50px",
+        width: "100%"
+      }}>
+        <Container className="text-center">
+          <p style={{ color: "#fff", fontSize: "1.2rem" }}>Suivez-nous sur :</p>
+          <div style={{ display: "flex", justifyContent: "center", gap: "15px" }}>
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+              <FaFacebook size={30} color="#ffffff" />
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+              <FaTwitter size={30} color="#ffffff" />
+            </a>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+              <FaInstagram size={30} color="#ffffff" />
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
+              <FaLinkedin size={30} color="#ffffff" />
+            </a>
+          </div>
+          <p style={{ color: "#fff", marginTop: "10px" }}>
+            © 2025 GoChallenges. Tous droits réservés.
+          </p>
+        </Container>
+      </footer>
     </div>
   );
 };
 
-export default Explorateur;
+export default Explorateur;     
